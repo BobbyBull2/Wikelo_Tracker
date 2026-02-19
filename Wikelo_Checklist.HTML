@@ -1,0 +1,1494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+	
+    <title>🪐 Bobby's Wikelo Tracker v4.6 🛸</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(circle at 20% 80%, rgba(120,119,198,0.25) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(255,119,198,0.25) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 40%, rgba(120,219,255,0.25) 0%, transparent 50%),
+                        linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 25%, #16213e 50%, #0f0f23 100%);
+            background-attachment: fixed;
+            color: #f0f0f0;
+            margin: 0;
+            padding: 15px;
+            min-height: 100vh;
+            line-height: 1.3;
+        }
+        .stars {
+            position: fixed; inset: 0; pointer-events: none; z-index: -1;
+            background: radial-gradient(1px 1px at 20px 30px, #eee),
+                        radial-gradient(1px 1px at 40px 70px, rgba(255,255,255,0.7)),
+                        radial-gradient(2px 2px at 90px 40px, #fff);
+            background-size: 300px 200px;
+            animation: twinkle 25s ease-in-out infinite alternate;
+        }
+        @keyframes twinkle { 0%,100% {opacity:0.9;} 50% {opacity:0.4;} }
+        h1 {
+            text-align: center;
+            color: #00ff99;
+            text-shadow: 0 0 12px #00ff99;
+            margin: 10px 0 6px;
+            font-size: 2em;
+        }
+        .subtitle {
+            text-align: center;
+            color: #99ff44;
+            margin: 0 0 20px;
+            font-size: 1.05em;
+            font-style: italic;
+        }
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin: 0 0 20px;
+        }
+        .print-btn, .reset-all-btn, .share-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 3px 12px rgba(0,255,153,0.4);
+        }
+        .print-btn { background: linear-gradient(45deg, #00ff99, #0099ff); color: #000; }
+        .reset-all-btn { background: linear-gradient(45deg, #ff6666, #cc3333); color: white; }
+        .share-btn { background: linear-gradient(45deg, #ffaa00, #ff6600); color: white; }
+        .stats { text-align: center; margin: 0 0 20px; font-size: 1.1em; }
+        .global-progress { width: 80%; max-width: 600px; height: 20px; background: rgba(0,0,0,0.6); border-radius: 10px; overflow: hidden; margin: 10px auto; }
+        .global-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #00ff99, #66ffbb); transition: width 1s ease; }
+        .search-box { width: 100%; max-width: 500px; padding: 10px; margin: 0 auto 20px; display: block; font-size: 1em; border-radius: 8px; border: 1px solid #44ffaa; background: rgba(0,0,0,0.5); color: white; }
+        .section { margin: 20px 0 16px; border-radius: 8px; overflow: hidden; background: rgba(8,12,25,0.94); box-shadow: 0 4px 16px rgba(0,0,0,0.5); }
+        .section-header { background: linear-gradient(90deg, rgba(0,255,153,0.35), rgba(0,153,255,0.35)); padding: 14px 16px; cursor: pointer; user-select: none; display: flex; justify-content: space-between; align-items: center; font-size: 1.22em; color: #ffcc00; text-shadow: 0 0 5px #ff9900; }
+        .section-header:hover { background: linear-gradient(90deg, rgba(0,255,153,0.5), rgba(0,153,255,0.5)); }
+        .section-header::after { content: '▼'; font-size: 1em; transition: transform 0.3s; }
+        .section[open] .section-header::after { transform: rotate(180deg); }
+        .header-columns { flex: 1; display: flex; align-items: center; gap: 20px; }
+        .col-name { flex: 0 0 260px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .col-progress { flex: 0 0 960px; }
+        .col-reward { flex: 1 1 auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #88ffdd; font-size: 0.94em; }
+        .progress-container { background: rgba(0,0,0,0.7); border-radius: 8px; height: 20px; overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.6); }
+        .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #00ff99, #66ffbb); transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); background-size: 200% 100%; animation: shine 3s linear infinite; }
+        @keyframes shine { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        .progress-complete .progress-bar { background: linear-gradient(90deg, #88ff88, #ccffcc); animation: shine-complete 2s linear infinite; }
+        @keyframes shine-complete { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        .section-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease, padding 0.3s ease; padding: 0 16px; position: relative; }
+        .section[open] .section-content { max-height: 2000px; padding: 14px 16px; }
+        .reset-btn { position: absolute; top: 10px; right: 16px; padding: 6px 12px; background: linear-gradient(45deg, #ff6666, #cc3333); color: #fff; border: none; border-radius: 6px; font-size: 0.85em; cursor: pointer; box-shadow: 0 2px 8px rgba(255,102,102,0.3); }
+        .reset-btn:hover { background: linear-gradient(45deg, #cc3333, #ff6666); }
+        td[data-tooltip] { position: relative; }
+        td[data-tooltip]:hover::after { content: attr(data-tooltip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.9); color: white; padding: 6px 10px; border-radius: 6px; font-size: 0.85em; white-space: nowrap; z-index: 10; pointer-events: none; }
+        .footer { text-align: center; font-size: 0.85em; color: #99ff44; margin: 20px 0; }
+        @media (max-width: 768px) { .header-columns { flex-direction: column; align-items: flex-start; gap: 8px; } .col-progress { width: 100%; flex: 0 0 auto; } .col-reward { width: 100%; } .controls { flex-direction: column; } .global-progress { width: 100%; } }
+        @media print { body { background: white !important; color: #000 !important; padding: 10px !important; } .stars, .print-btn, .reset-btn, .controls, .stats, .search-box, .footer { display: none !important; } h1, .subtitle { text-align: left !important; } .section-header { background: #e8f4ff !important; color: #000 !important; text-shadow: none; } .progress-container { display: none !important; } .section-content { max-height: none !important; padding: 10px 12px !important; } table { background: white !important; } th { background: #f0f8ff !important; color: #000 !important; } td { border-bottom: 1px solid #ccc !important; color: #000 !important; } .collected input { border: 1px dashed #777 !important; background: #f8f8f8 !important; color: #000 !important; } @page { size: A4 landscape; margin: 10mm; } }
+   
+/* Core responsive rules (apply always) */
+.header-columns {
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.col-name {
+    flex: 1 1 220px;          /* grow but keep reasonable min */
+    min-width: 200px;
+    max-width: 35%;           /* cap so progress gets room */
+}
+
+.col-progress {
+    flex: 3 1 400px;          /* progress takes most space */
+    min-width: 300px;
+}
+
+.col-reward {
+    flex: 1 1 250px;
+    min-width: 220px;
+}
+
+/* Table horizontal scroll instead of overflow/cutoff */
+.section-content table {
+    width: 100%;
+    min-width: 600px;         /* force scroll if narrower than this */
+    overflow-x: auto;
+    display: block;
+}
+
+/* Only force stacking on very narrow screens (phones, tiny windows) */
+@media (max-width: 720px) {
+    .header-columns {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .col-name,
+    .col-progress,
+    .col-reward {
+        flex: none;
+        width: 100%;
+        max-width: none;
+        min-width: 0;
+    }
+
+    .col-name {
+        order: 1;
+        font-size: 1.15em;
+        text-align: center;
+    }
+
+    .col-progress {
+        order: 2;
+    }
+
+    .col-reward {
+        order: 3;
+        font-size: 0.95em;
+        text-align: center;
+        margin-top: 5px;
+    }
+
+    /* Make reset button full-width friendly */
+    .reset-btn {
+        position: static;
+        margin: 12px auto;
+        display: block;
+        width: fit-content;
+        padding: 8px 16px;
+    }
+
+    input[type="number"] {
+        width: 100px;
+    }
+}
+
+/* Always full-width for global elements */
+.global-progress,
+.search-box {
+    width: 100% !important;
+    max-width: none !important;
+}
+
+ </style>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="stars"></div>
+    <h1>🪐 Bobby's Wikelo Tracker v4.6 🛸</h1>
+    <p class="subtitle">Hunt → Claim Rewards – Progress saved automatically</p>
+
+    <div class="controls">
+        <button class="print-btn" onclick="window.print()">🖨️ Print (Landscape)</button>
+        <button class="reset-all-btn" onclick="resetAll()">Reset All Progress</button>
+        <button class="share-btn" onclick="shareProgress()">Share Progress</button>
+    </div>
+
+    <div class="stats">
+        <div id="stats-text">0/54 Contracts Complete • Global Progress: 0%</div>
+        <div class="global-progress">
+            <div class="global-bar" id="global-bar"></div>
+        </div>
+    </div>
+
+    <input type="text" class="search-box" id="search" placeholder="Search contracts or rewards..." oninput="filterContracts()">
+
+    <!-- 54 Contracts - Alphabetical Order -->
+
+    <div class="section" id="a2-hercules-starlifter">
+        <div class="section-header">
+            <div class="header-columns">
+                <div class="col-name">Starlifter A2 War Mod</div>
+                <div class="col-progress"><div class="progress-container"><div class="progress-bar"></div></div></div>
+                <div class="col-reward"><strong>Reward:</strong> A2 Hercules Starlifter</div>
+            </div>
+        </div>
+        <div class="section-content">
+            <button class="reset-btn" onclick="resetProgress('a2-hercules-starlifter')">Reset Progress</button>
+            <table>
+                <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+                <tbody>
+                    <tr><td data-tooltip="Earned from Wikelo contracts/missions">Wikelo Favor</td><td>50</td><td class="collected"><input type="number" min="0" data-id="a2-wikelo-favor"></td><td class="complete"><input type="checkbox" data-id="a2-wikelo-favor-done"></td></tr>
+                    <tr><td data-tooltip="Rare item from events">Polaris Bit</td><td>20</td><td class="collected"><input type="number" min="0" data-id="a2-polaris-bit"></td><td class="complete"><input type="checkbox" data-id="a2-polaris-bit-done"></td></tr>
+                    <tr><td data-tooltip="Loot from merc missions">MG Scrip</td><td>20</td><td class="collected"><input type="number" min="0" data-id="a2-mg-scrip"></td><td class="complete"><input type="checkbox" data-id="a2-mg-scrip-done"></td></tr>
+                    <tr><td data-tooltip="Rewards from investigation missions in the ASD facilities">ASD Secure Drive</td><td>6</td><td class="collected"><input type="number" min="0" data-id="a2-asd"></td><td class="complete"><input type="checkbox" data-id="a2-asd-done"></td></tr>
+                    <tr><td data-tooltip="Rare pristine item from events/loot">Irradiated Valakkar Pearl (AAA)</td><td>6</td><td class="collected"><input type="number" min="0" data-id="a2-pearl-aaa"></td><td class="complete"><input type="checkbox" data-id="a2-pearl-aaa-done"></td></tr>
+                    <tr><td data-tooltip="Rare pristine item from events/loot">Tevarin War Service Marker (Pristine)</td><td>6</td><td class="collected"><input type="number" min="0" data-id="a2-tevarin"></td><td class="complete"><input type="checkbox" data-id="a2-tevarin-done"></td></tr>
+                    <tr><td data-tooltip="Loot from abandoned facilities or containers">DCHS-05 Orbital Positioning Comp-Board</td><td>6</td><td class="collected"><input type="number" min="0" data-id="a2-dchs"></td><td class="complete"><input type="checkbox" data-id="a2-dchs-done"></td></tr>
+                    <tr><td data-tooltip="Refined from Carinite ore">Carinite (Pure)</td><td>6</td><td class="collected"><input type="number" min="0" data-id="a2-carinite-pure"></td><td class="complete"><input type="checkbox" data-id="a2-carinite-pure-done"></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="section" id="aopoa-nox">
+        <div class="section-header">
+            <div class="header-columns">
+                <div class="col-name">Noxy Mod</div>
+                <div class="col-progress"><div class="progress-container"><div class="progress-bar"></div></div></div>
+                <div class="col-reward"><strong>Reward:</strong> Aopoa Nox</div>
+            </div>
+        </div>
+        <div class="section-content">
+            <button class="reset-btn" onclick="resetProgress('aopoa-nox')">Reset Progress</button>
+            <table>
+                <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+                <tbody>
+                    <tr><td data-tooltip="Earned from Wikelo contracts/missions">Wikelo Favor</td><td>4</td><td class="collected"><input type="number" min="0" data-id="aopoa-nox-wikelo-favor"></td><td class="complete"><input type="checkbox" data-id="aopoa-nox-wikelo-favor-done"></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="section" id="atls-cool-metal-color">
+        <div class="section-header">
+            <div class="header-columns">
+                <div class="col-name">ATLS Cool Metal Color</div>
+                <div class="col-progress"><div class="progress-container"><div class="progress-bar"></div></div></div>
+                <div class="col-reward"><strong>Reward:</strong> ATLS GEO 'Cool Metal'</div>
+            </div>
+        </div>
+        <div class="section-content">
+            <button class="reset-btn" onclick="resetProgress('atls-cool-metal-color')">Reset Progress</button>
+            <table>
+                <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+                <tbody>
+                    <tr><td data-tooltip="Earned from Wikelo contracts/missions">Wikelo Favor</td><td>1</td><td class="collected"><input type="number" min="0" data-id="atls-cool-metal-wikelo-favor"></td><td class="complete"><input type="checkbox" data-id="atls-cool-metal-wikelo-favor-done"></td></tr>
+                    <tr><td data-tooltip="Refined from Carinite ore">Carinite (Pure)</td><td>1</td><td class="collected"><input type="number" min="0" data-id="atls-cool-metal-carinite-pure"></td><td class="complete"><input type="checkbox" data-id="atls-cool-metal-carinite-pure-done"></td></tr>
+                    <tr><td data-tooltip="Base vehicle required">Argo ATLS</td><td>1</td><td class="collected"><input type="number" min="0" data-id="atls-cool-metal-argo-atls"></td><td class="complete"><input type="checkbox" data-id="atls-cool-metal-argo-atls-done"></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="section" id="atls-geo-ikti">
+        <div class="section-header">
+            <div class="header-columns">
+                <div class="col-name">Make ATLS shoot</div>
+                <div class="col-progress"><div class="progress-container"><div class="progress-bar"></div></div></div>
+                <div class="col-reward"><strong>Reward:</strong> ATLS IKTI</div>
+            </div>
+        </div>
+        <div class="section-content">
+            <button class="reset-btn" onclick="resetProgress('atls-geo-ikti')">Reset Progress</button>
+            <table>
+                <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+                <tbody>
+                    <tr><td data-tooltip="Base vehicle required">Argo ATLS</td><td>1</td><td class="collected"><input type="number" min="0" data-id="atls-geo-ikti-argo-atls"></td><td class="complete"><input type="checkbox" data-id="atls-geo-ikti-argo-atls-done"></td></tr>
+                    <tr><td data-tooltip="Earned from Wikelo contracts/missions">Wikelo Favor</td><td>2</td><td class="collected"><input type="number" min="0" data-id="atls-geo-ikti-wikelo-favor"></td><td class="complete"><input type="checkbox" data-id="atls-geo-ikti-wikelo-favor-done"></td></tr>
+                    <tr><td data-tooltip="Rare irradiated item from events">Irradiated Valakkar Fang (Apex)</td><td>5</td><td class="collected"><input type="number" min="0" data-id="atls-geo-ikti-fang-apex"></td><td class="complete"><input type="checkbox" data-id="atls-geo-ikti-fang-apex-done"></td></tr>
+                    <tr><td data-tooltip="Weapon attachment">NN-13 Cannon</td><td>2</td><td class="collected"><input type="number" min="0" data-id="atls-geo-ikti-nn13"></td><td class="complete"><input type="checkbox" data-id="atls-geo-ikti-nn13-done"></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="section" id="atls-geo-snowland">
+        <div class="section-header">
+            <div class="header-columns">
+                <div class="col-name">ATLS Snowland Color</div>
+                <div class="col-progress"><div class="progress-container"><div class="progress-bar"></div></div></div>
+                <div class="col-reward"><strong>Reward:</strong> ATLS GEO 'Snowland'</div>
+            </div>
+        </div>
+        <div class="section-content">
+            <button class="reset-btn" onclick="resetProgress('atls-geo-snowland')">Reset Progress</button>
+            <table>
+                <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+                <tbody>
+                    <tr><td data-tooltip="Earned from Wikelo contracts/missions">Wikelo Favor</td><td>1</td><td class="collected"><input type="number" min="0" data-id="atls-geo-snowland-wikelo-favor"></td><td class="complete"><input type="checkbox" data-id="atls-geo-snowland-wikelo-favor-done"></td></tr>
+                    <tr><td data-tooltip="Rare irradiated item from events">Irradiated Valakkar Pearl (AAA)</td><td>1</td><td class="collected"><input type="number" min="0" data-id="atls-geo-snowland-pearl-aaa"></td><td class="complete"><input type="checkbox" data-id="atls-geo-snowland-pearl-aaa-done"></td></tr>
+                    <tr><td data-tooltip="Base vehicle required">Argo ATLS</td><td>1</td><td class="collected"><input type="number" min="0" data-id="atls-geo-snowland-argo-atls"></td><td class="complete"><input type="checkbox" data-id="atls-geo-snowland-argo-atls-done"></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="section" id="atls-geo-orange-line">
+        <div class="section-header">
+            <div class="header-columns">
+                <div class="col-name">ATLS Orange Line</div>
+                <div class="col-progress"><div class="progress-container"><div class="progress-bar"></div></div></div>
+                <div class="col-reward"><strong>Reward:</strong> ATLS GEO 'Orange Line'</div>
+            </div>
+        </div>
+        <div class="section-content">
+            <button class="reset-btn" onclick="resetProgress('atls-geo-orange-line')">Reset Progress</button>
+            <table>
+                <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+                <tbody>
+                    <tr><td data-tooltip="Earned from Wikelo contracts/missions">Wikelo Favor</td><td>1</td><td class="collected"><input type="number" min="0" data-id="atls-geo-orange-wikelo-favor"></td><td class="complete"><input type="checkbox" data-id="atls-geo-orange-wikelo-favor-done"></td></tr>
+                    <tr><td data-tooltip="Raw ore from mining">Quantainium</td><td>36</td><td class="collected"><input type="number" min="0" data-id="atls-geo-orange-quantainium"></td><td class="complete"><input type="checkbox" data-id="atls-geo-orange-quantainium-done"></td></tr>
+                    <tr><td data-tooltip="Refined metal">Copper</td><td>8</td><td class="collected"><input type="number" min="0" data-id="atls-geo-orange-copper"></td><td class="complete"><input type="checkbox" data-id="atls-geo-orange-copper-done"></td></tr>
+                    <tr><td data-tooltip="Refined metal">Tungsten</td><td>8</td><td class="collected"><input type="number" min="0" data-id="atls-geo-orange-tungsten"></td><td class="complete"><input type="checkbox" data-id="atls-geo-orange-tungsten-done"></td></tr>
+                    <tr><td data-tooltip="Refined mineral">Corundum</td><td>8</td><td class="collected"><input type="number" min="0" data-id="atls-geo-orange-corundum"></td><td class="complete"><input type="checkbox" data-id="atls-geo-orange-corundum-done"></td></tr>
+                    <tr><td data-tooltip="Base vehicle required">Argo ATLS</td><td>1</td><td class="collected"><input type="number" min="0" data-id="atls-geo-orange-argo-atls"></td><td class="complete"><input type="checkbox" data-id="atls-geo-orange-argo-atls-done"></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="section" id="atls-geo-ikti-jumpy">
+        <div class="section-header">
+            <div class="header-columns">
+                <div class="col-name">Make jumpy ATLS shoot</div>
+                <div class="col-progress"><div class="progress-container"><div class="progress-bar"></div></div></div>
+                <div class="col-reward"><strong>Reward:</strong> ATLS GEO IKTI</div>
+            </div>
+        </div>
+        <div class="section-content">
+            <button class="reset-btn" onclick="resetProgress('atls-geo-ikti-jumpy')">Reset Progress</button>
+            <table>
+                <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+                <tbody>
+                    <tr><td data-tooltip="Base vehicle variant">Argo ATLS Geo</td><td>1</td><td class="collected"><input type="number" min="0" data-id="atls-geo-ikti-jumpy-argo-geo"></td><td class="complete"><input type="checkbox" data-id="atls-geo-ikti-jumpy-argo-geo-done"></td></tr>
+                    <tr><td data-tooltip="Previous mod">Argo ATLS Ikti</td><td>1</td><td class="collected"><input type="number" min="0" data-id="atls-geo-ikti-jumpy-argo-ikti"></td><td class="complete"><input type="checkbox" data-id="atls-geo-ikti-jumpy-argo-ikti-done"></td></tr>
+                    <tr><td data-tooltip="Weapon attachment">NN-13 Cannon</td><td>2</td><td class="collected"><input type="number" min="0" data-id="atls-geo-ikti-jumpy-nn13"></td><td class="complete"><input type="checkbox" data-id="atls-geo-ikti-jumpy-nn13-done"></td></tr>
+                    <tr><td data-tooltip="Earned from Wikelo contracts/missions">Wikelo Favor</td><td>1</td><td class="collected"><input type="number" min="0" data-id="atls-geo-ikti-jumpy-wikelo-favor"></td><td class="complete"><input type="checkbox" data-id="atls-geo-ikti-jumpy-wikelo-favor-done"></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="section" id="bokto-armor-set">
+        <div class="section-header">
+            <div class="header-columns">
+                <div class="col-name">Make glowy armor</div>
+                <div class="col-progress"><div class="progress-container"><div class="progress-bar"></div></div></div>
+                <div class="col-reward"><strong>Reward:</strong> Bokto Armor set</div>
+            </div>
+        </div>
+        <div class="section-content">
+            <button class="reset-btn" onclick="resetProgress('bokto-armor-set')">Reset Progress</button>
+            <table>
+                <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+                <tbody>
+                    <tr><td data-tooltip="Rare irradiated item from events">Irradiated Valakkar Pearl (AAA)</td><td>1</td><td class="collected"><input type="number" min="0" data-id="bokto-pearl-aaa"></td><td class="complete"><input type="checkbox" data-id="bokto-pearl-aaa-done"></td></tr>
+                    <tr><td data-tooltip="Armor piece">Antium Core</td><td>1</td><td class="collected"><input type="number" min="0" data-id="bokto-antium-core"></td><td class="complete"><input type="checkbox" data-id="bokto-antium-core-done"></td></tr>
+                    <tr><td data-tooltip="Armor piece">Antium Helmet</td><td>1</td><td class="collected"><input type="number" min="0" data-id="bokto-antium-helmet"></td><td class="complete"><input type="checkbox" data-id="bokto-antium-helmet-done"></td></tr>
+                    <tr><td data-tooltip="Armor piece">Antium Legs</td><td>1</td><td class="collected"><input type="number" min="0" data-id="bokto-antium-legs"></td><td class="complete"><input type="checkbox" data-id="bokto-antium-legs-done"></td></tr>
+                    <tr><td data-tooltip="Armor piece">Antium Arms</td><td>1</td><td class="collected"><input type="number" min="0" data-id="bokto-antium-arms"></td><td class="complete"><input type="checkbox" data-id="bokto-antium-arms-done"></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="section" id="boomtube-clanguard">
+        <div class="section-header">
+            <div class="header-columns">
+                <div class="col-name">Curious Weapon</div>
+                <div class="col-progress"><div class="progress-container"><div class="progress-bar"></div></div></div>
+                <div class="col-reward"><strong>Reward:</strong> Boomtube 'Clanguard' Rocket Launcher</div>
+            </div>
+        </div>
+        <div class="section-content">
+            <button class="reset-btn" onclick="resetProgress('boomtube-clanguard')">Reset Progress</button>
+            <table>
+                <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+                <tbody>
+                    <tr><td data-tooltip="Base weapon required">Boomtube Rocket Launcher</td><td>1</td><td class="collected"><input type="number" min="0" data-id="boomtube-clanguard-boomtube"></td><td class="complete"><input type="checkbox" data-id="boomtube-clanguard-boomtube-done"></td></tr>
+                    <tr><td data-tooltip="Loot from Vanduul wrecks or events">Vanduul Plating</td><td>2</td><td class="collected"><input type="number" min="0" data-id="boomtube-clanguard-vanduul-plating"></td><td class="complete"><input type="checkbox" data-id="boomtube-clanguard-vanduul-plating-done"></td></tr>
+                    <tr><td data-tooltip="Loot from Vanduul wrecks or events">Vanduul Metal</td><td>2</td><td class="collected"><input type="number" min="0" data-id="boomtube-clanguard-vanduul-metal"></td><td class="complete"><input type="checkbox" data-id="boomtube-clanguard-vanduul-metal-done"></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="section" id="corbel-crush-set">
+        <div class="section-header">
+            <div class="header-columns">
+                <div class="col-name">Shiny Builder Suit</div>
+                <div class="col-progress"><div class="progress-container"><div class="progress-bar"></div></div></div>
+                <div class="col-reward"><strong>Reward:</strong> Corbel Crush Set</div>
+            </div>
+        </div>
+        <div class="section-content">
+            <button class="reset-btn" onclick="resetProgress('corbel-crush-set')">Reset Progress</button>
+            <table>
+                <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+                <tbody>
+                    <tr><td data-tooltip="Armor piece from Corbel series">Corbel Mire Helmet</td><td>1</td><td class="collected"><input type="number" min="0" data-id="corbel-crush-helmet"></td><td class="complete"><input type="checkbox" data-id="corbel-crush-helmet-done"></td></tr>
+                    <tr><td data-tooltip="Armor piece from Corbel series">Corbel Mire Core</td><td>1</td><td class="collected"><input type="number" min="0" data-id="corbel-crush-core"></td><td class="complete"><input type="checkbox" data-id="corbel-crush-core-done"></td></tr>
+                    <tr><td data-tooltip="Armor piece from Corbel series">Corbel Mire Legs</td><td>1</td><td class="collected"><input type="number" min="0" data-id="corbel-crush-legs"></td><td class="complete"><input type="checkbox" data-id="corbel-crush-legs-done"></td></tr>
+                    <tr><td data-tooltip="Armor piece from Corbel series">Corbel Mire Arms</td><td>1</td><td class="collected"><input type="number" min="0" data-id="corbel-crush-arms"></td><td class="complete"><input type="checkbox" data-id="corbel-crush-arms-done"></td></tr>
+                    <tr><td data-tooltip="Backpack piece from Corbel series">Corbel Mire Novikov Backpack</td><td>1</td><td class="collected"><input type="number" min="0" data-id="corbel-crush-backpack"></td><td class="complete"><input type="checkbox" data-id="corbel-crush-backpack-done"></td></tr>
+                    <tr><td data-tooltip="Rewards from investigation missions in the ASD facilities">ASD Secure Drive</td><td>10</td><td class="collected"><input type="number" min="0" data-id="corbel-crush-asd"></td><td class="complete"><input type="checkbox" data-id="corbel-crush-asd-done"></td></tr>
+                    <tr><td data-tooltip="Rare item">RCMBNT-RGL-1</td><td>5</td><td class="collected"><input type="number" min="0" data-id="corbel-crush-rgl1"></td><td class="complete"><input type="checkbox" data-id="corbel-crush-rgl1-done"></td></tr>
+                    <tr><td data-tooltip="Rare item">RCMBNT-RGL-2</td><td>5</td><td class="collected"><input type="number" min="0" data-id="corbel-crush-rgl2"></td><td class="complete"><input type="checkbox" data-id="corbel-crush-rgl2-done"></td></tr>
+                    <tr><td data-tooltip="Rare item">RCMBNT-RGL-3</td><td>5</td><td class="collected"><input type="number" min="0" data-id="corbel-crush-rgl3"></td><td class="complete"><input type="checkbox" data-id="corbel-crush-rgl3-done"></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="section" id="constellation-taurus">
+        <div class="section-header">
+            <div class="header-columns">
+                <div class="col-name">Want Taurus ship</div>
+                <div class="col-progress"><div class="progress-container"><div class="progress-bar"></div></div></div>
+                <div class="col-reward"><strong>Reward:</strong> Constellation Taurus</div>
+            </div>
+        </div>
+        <div class="section-content">
+            <button class="reset-btn" onclick="resetProgress('constellation-taurus')">Reset Progress</button>
+            <table>
+                <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+                <tbody>
+                    <tr><td data-tooltip="Earned from Wikelo contracts/missions">Wikelo Favor</td><td>30</td><td class="collected"><input type="number" min="0" data-id="taurus-wikelo-favor"></td><td class="complete"><input type="checkbox" data-id="taurus-wikelo-favor-done"></td></tr>
+                    <tr><td data-tooltip="Refined from Carinite ore">Carinite (Pure)</td><td>3</td><td class="collected"><input type="number" min="0" data-id="taurus-carinite-pure"></td><td class="complete"><input type="checkbox" data-id="taurus-carinite-pure-done"></td></tr>
+                    <tr><td data-tooltip="Rare irradiated item from events">Irradiated Valakkar Pearl (AAA)</td><td>3</td><td class="collected"><input type="number" min="0" data-id="taurus-pearl-aaa"></td><td class="complete"><input type="checkbox" data-id="taurus-pearl-aaa-done"></td></tr>
+                    <tr><td data-tooltip="Rare pristine item from events/loot">Government Cartography Agency Medal (Pristine)</td><td>3</td><td class="collected"><input type="number" min="0" data-id="taurus-gca-medal"></td><td class="complete"><input type="checkbox" data-id="taurus-gca-medal-done"></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="section" id="crusader-ares-inferno">
+        <div class="section-header">
+            <div class="header-columns">
+                <div class="col-name">Starfighter Inferno Special</div>
+                <div class="col-progress"><div class="progress-container"><div class="progress-bar"></div></div></div>
+                <div class="col-reward"><strong>Reward:</strong> Crusader Ares Inferno</div>
+            </div>
+        </div>
+        <div class="section-content">
+            <button class="reset-btn" onclick="resetProgress('crusader-ares-inferno')">Reset Progress</button>
+            <table>
+                <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+                <tbody>
+                    <tr><td data-tooltip="Earned from Wikelo contracts/missions">Wikelo Favor</td><td>10</td><td class="collected"><input type="number" min="0" data-id="ares-inferno-wikelo-favor"></td><td class="complete"><input type="checkbox" data-id="ares-inferno-wikelo-favor-done"></td></tr>
+                    <tr><td data-tooltip="Yormandi loot">Yormandi Tongue</td><td>5</td><td class="collected"><input type="number" min="0" data-id="ares-inferno-yormandi-tongue"></td><td class="complete"><input type="checkbox" data-id="ares-inferno-yormandi-tongue-done"></td></tr>
+                    <tr><td data-tooltip="Helmet from Ace series">Ace Interceptor Helmet</td><td>5</td><td class="collected"><input type="number" min="0" data-id="ares-inferno-ace-helmet"></td><td class="complete"><input type="checkbox" data-id="ares-inferno-ace-helmet-done"></td></tr>
+                    <tr><td data-tooltip="Rare pristine item from events/loot">UEE 6th Platoon Medal (Pristine)</td><td>1</td><td class="collected"><input type="number" min="0" data-id="ares-inferno-uee-medal"></td><td class="complete"><input type="checkbox" data-id="ares-inferno-uee-medal-done"></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="section" id="crusader-ares-ion">
+        <div class="section-header">
+            <div class="header-columns">
+                <div class="col-name">Sneaky Starfighter Ion</div>
+                <div class="col-progress"><div class="progress-container"><div class="progress-bar"></div></div></div>
+                <div class="col-reward"><strong>Reward:</strong> Crusader Ares Ion</div>
+            </div>
+        </div>
+        <div class="section-content">
+            <button class="reset-btn" onclick="resetProgress('crusader-ares-ion')">Reset Progress</button>
+            <table>
+                <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+                <tbody>
+                    <tr><td data-tooltip="Earned from Wikelo contracts/missions">Wikelo Favor</td><td>10</td><td class="collected"><input type="number" min="0" data-id="ares-ion-wikelo-favor"></td><td class="complete"><input type="checkbox" data-id="ares-ion-wikelo-favor-done"></td></tr>
+                    <tr><td data-tooltip="Yormandi loot">Yormandi Eye</td><td>10</td><td class="collected"><input type="number" min="0" data-id="ares-ion-yormandi-eye"></td><td class="complete"><input type="checkbox" data-id="ares-ion-yormandi-eye-done"></td></tr>
+                    <tr><td data-tooltip="Helmet from Ace series">Ace Interceptor Helmet</td><td>10</td><td class="collected"><input type="number" min="0" data-id="ares-ion-ace-helmet"></td><td class="complete"><input type="checkbox" data-id="ares-ion-ace-helmet-done"></td></tr>
+                    <tr><td data-tooltip="Rare pristine item from events/loot">Tevarin War Service Marker (Pristine)</td><td>1</td><td class="collected"><input type="number" min="0" data-id="ares-ion-tevarin-marker"></td><td class="complete"><input type="checkbox" data-id="ares-ion-tevarin-marker-done"></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="section" id="crusader-c1-spirit">
+        <div class="section-header">
+            <div class="header-columns">
+                <div class="col-name">Spirit cargo mod</div>
+                <div class="col-progress"><div class="progress-container"><div class="progress-bar"></div></div></div>
+                <div class="col-reward"><strong>Reward:</strong> Crusader C1 Spirit</div>
+            </div>
+        </div>
+        <div class="section-content">
+            <button class="reset-btn" onclick="resetProgress('crusader-c1-spirit')">Reset Progress</button>
+            <table>
+                <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+                <tbody>
+                    <tr><td data-tooltip="Earned from Wikelo contracts/missions">Wikelo Favor</td><td>8</td><td class="collected"><input type="number" min="0" data-id="c1-spirit-wikelo-favor"></td><td class="complete"><input type="checkbox" data-id="c1-spirit-wikelo-favor-done"></td></tr>
+                    <tr><td data-tooltip="Rare pristine item from events/loot">Tevarin War Service Marker (Pristine)</td><td>1</td><td class="collected"><input type="number" min="0" data-id="c1-spirit-tevarin-marker"></td><td class="complete"><input type="checkbox" data-id="c1-spirit-tevarin-marker-done"></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="section" id="crusader-intrepid">
+        <div class="section-header">
+            <div class="header-columns">
+                <div class="col-name">Upgrade Intrepid</div>
+                <div class="col-progress"><div class="progress-container"><div class="progress-bar"></div></div></div>
+                <div class="col-reward"><strong>Reward:</strong> Crusader Intrepid</div>
+            </div>
+        </div>
+        <div class="section-content">
+            <button class="reset-btn" onclick="resetProgress('crusader-intrepid')">Reset Progress</button>
+            <table>
+                <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+                <tbody>
+                    <tr><td data-tooltip="Rare pristine item from events/loot">Government Cartography Agency Medal (Pristine)</td><td>1</td><td class="collected"><input type="number" min="0" data-id="intrepid-gca-medal"></td><td class="complete"><input type="checkbox" data-id="intrepid-gca-medal-done"></td></tr>
+                    <tr><td data-tooltip="Earned from Wikelo contracts/missions">Wikelo Favor</td><td>3</td><td class="collected"><input type="number" min="0" data-id="intrepid-wikelo-favor"></td><td class="complete"><input type="checkbox" data-id="intrepid-wikelo-favor-done"></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="section" id="drake-golem">
+        <div class="section-header">
+            <div class="header-columns">
+                <div class="col-name">Golem Rocks</div>
+                <div class="col-progress"><div class="progress-container"><div class="progress-bar"></div></div></div>
+                <div class="col-reward"><strong>Reward:</strong> Drake Golem</div>
+            </div>
+        </div>
+        <div class="section-content">
+            <button class="reset-btn" onclick="resetProgress('drake-golem')">Reset Progress</button>
+            <table>
+                <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+                <tbody>
+                    <tr><td data-tooltip="Earned from Wikelo contracts/missions">Wikelo Favor</td><td>2</td><td class="collected"><input type="number" min="0" data-id="golem-wikelo-favor"></td><td class="complete"><input type="checkbox" data-id="golem-wikelo-favor-done"></td></tr>
+                    <tr><td data-tooltip="Rewards from investigation missions in the ASD facilities">ASD Secure Drive</td><td>15</td><td class="collected"><input type="number" min="0" data-id="golem-asd"></td><td class="complete"><input type="checkbox" data-id="golem-asd-done"></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="section" id="f8c-lightning-military-spec">
+        <div class="section-header">
+            <div class="header-columns">
+                <div class="col-name">F8 War Mod</div>
+                <div class="col-progress"><div class="progress-container"><div class="progress-bar"></div></div></div>
+                <div class="col-reward"><strong>Reward:</strong> F8C Lightning (Military Spec)</div>
+            </div>
+        </div>
+        <div class="section-content">
+            <button class="reset-btn" onclick="resetProgress('f8c-lightning-military-spec')">Reset Progress</button>
+            <table>
+                <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+                <tbody>
+                    <tr><td data-tooltip="Earned from Wikelo contracts/missions">Wikelo Favor</td><td>40</td><td class="collected"><input type="number" min="0" data-id="f8-military-wikelo-favor"></td><td class="complete"><input type="checkbox" data-id="f8-military-wikelo-favor-done"></td></tr>
+                    <tr><td data-tooltip="Refined from Carinite ore">Carinite (Pure)</td><td>4</td><td class="collected"><input type="number" min="0" data-id="f8-military-carinite-pure"></td><td class="complete"><input type="checkbox" data-id="f8-military-carinite-pure-done"></td></tr>
+                    <tr><td data-tooltip="Rare irradiated item from events">Irradiated Valakkar Pearl (AAA)</td><td>4</td><td class="collected"><input type="number" min="0" data-id="f8-military-pearl-aaa"></td><td class="complete"><input type="checkbox" data-id="f8-military-pearl-aaa-done"></td></tr>
+                    <tr><td data-tooltip="Rare pristine item from events/loot">Tevarin War Service Marker (Pristine)</td><td>4</td><td class="collected"><input type="number" min="0" data-id="f8-military-tevarin-marker"></td><td class="complete"><input type="checkbox" data-id="f8-military-tevarin-marker-done"></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="section" id="f8c-lightning-stealth-spec">
+        <div class="section-header">
+            <div class="header-columns">
+                <div class="col-name">Sneaky Stabber</div>
+                <div class="col-progress"><div class="progress-container"><div class="progress-bar"></div></div></div>
+                <div class="col-reward"><strong>Reward:</strong> F8C Lightning (Stealth Spec)</div>
+            </div>
+        </div>
+        <div class="section-content">
+            <button class="reset-btn" onclick="resetProgress('f8c-lightning-stealth-spec')">Reset Progress</button>
+            <table>
+                <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+                <tbody>
+                    <tr><td data-tooltip="Earned from Wikelo contracts/missions">Wikelo Favor</td><td>40</td><td class="collected"><input type="number" min="0" data-id="f8-stealth-wikelo-favor"></td><td class="complete"><input type="checkbox" data-id="f8-stealth-wikelo-favor-done"></td></tr>
+                    <tr><td data-tooltip="Loot from orbital stations or wrecks">DCHS-05 Orbital Positioning Comp-Board</td><td>15</td><td class="collected"><input type="number" min="0" data-id="f8-stealth-dchs"></td><td class="complete"><input type="checkbox" data-id="f8-stealth-dchs-done"></td></tr>
+                    <tr><td data-tooltip="Refined from Carinite ore">Carinite (Pure)</td><td>3</td><td class="collected"><input type="number" min="0" data-id="f8-stealth-carinite-pure"></td><td class="complete"><input type="checkbox" data-id="f8-stealth-carinite-pure-done"></td></tr>
+                    <tr><td data-tooltip="Rare irradiated item from events">Irradiated Valakkar Pearl (AAA)</td><td>3</td><td class="collected"><input type="number" min="0" data-id="f8-stealth-pearl-aaa"></td><td class="complete"><input type="checkbox" data-id="f8-stealth-pearl-aaa-done"></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="section" id="f7c-m-super-hornet-mk-ii">
+        <div class="section-header">
+            <div class="header-columns">
+                <div class="col-name">Wikelo Navy F7</div>
+                <div class="col-progress"><div class="progress-container"><div class="progress-bar"></div></div></div>
+                <div class="col-reward"><strong>Reward:</strong> F7C-M Super Hornet Mk II</div>
+            </div>
+        </div>
+        <div class="section-content">
+            <button class="reset-btn" onclick="resetProgress('f7c-m-super-hornet-mk-ii')">Reset Progress</button>
+            <table>
+                <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+                <tbody>
+                    <tr><td data-tooltip="Earned from Wikelo contracts/missions">Wikelo Favor</td><td>16</td><td class="collected"><input type="number" min="0" data-id="f7-wikelo-favor"></td><td class="complete"><input type="checkbox" data-id="f7-wikelo-favor-done"></td></tr>
+                    <tr><td data-tooltip="Loot from orbital stations or wrecks">DCHS-05 Orbital Positioning Comp-Board</td><td>3</td><td class="collected"><input type="number" min="0" data-id="f7-dchs"></td><td class="complete"><input type="checkbox" data-id="f7-dchs-done"></td></tr>
+                    <tr><td data-tooltip="Helmet from Ace series">Ace Interceptor Helmet</td><td>5</td><td class="collected"><input type="number" min="0" data-id="f7-ace-helmet"></td><td class="complete"><input type="checkbox" data-id="f7-ace-helmet-done"></td></tr>
+                    <tr><td data-tooltip="Rare pristine item from events/loot">Government Cartography Agency Medal (Pristine)</td><td>1</td><td class="collected"><input type="number" min="0" data-id="f7-gca-medal"></td><td class="complete"><input type="checkbox" data-id="f7-gca-medal-done"></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="section" id="fun-kopion-skull-gun">
+        <div class="section-header">
+            <div class="header-columns">
+                <div class="col-name">Fun Kopion Skull Gun</div>
+                <div class="col-progress"><div class="progress-container"><div class="progress-bar"></div></div></div>
+                <div class="col-reward"><strong>Reward:</strong> Parallax 'Fun Kopion Skull' Energy Assault Rifle</div>
+            </div>
+        </div>
+        <div class="section-content">
+            <button class="reset-btn" onclick="resetProgress('fun-kopion-skull-gun')">Reset Progress</button>
+            <table>
+                <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+                <tbody>
+                    <tr><td data-tooltip="Raw ore from mining">Jaclium (Ore)</td><td>20</td><td class="collected"><input type="number" min="0" data-id="fun-kopion-jaclium"></td><td class="complete"><input type="checkbox" data-id="fun-kopion-jaclium-done"></td></tr>
+                    <tr><td data-tooltip="Raw ore from mining">Saldynium (Ore)</td><td>15</td><td class="collected"><input type="number" min="0" data-id="fun-kopion-saldynium"></td><td class="complete"><input type="checkbox" data-id="fun-kopion-saldynium-done"></td></tr>
+                    <tr><td data-tooltip="Raw ore from mining">Carinite</td><td>10</td><td class="collected"><input type="number" min="0" data-id="fun-kopion-carinite"></td><td class="complete"><input type="checkbox" data-id="fun-kopion-carinite-done"></td></tr>
+                    <tr><td data-tooltip="Base weapon required">Parallax Energy Assault Rifle</td><td>1</td><td class="collected"><input type="number" min="0" data-id="fun-kopion-parallax"></td><td class="complete"><input type="checkbox" data-id="fun-kopion-parallax-done"></td></tr>
+                    <tr><td data-tooltip="Kopion loot">Tundra Kopion Horn</td><td>20</td><td class="collected"><input type="number" min="0" data-id="fun-kopion-kopion-horn"></td><td class="complete"><input type="checkbox" data-id="fun-kopion-kopion-horn-done"></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="section" id="fun-military-skull-gun">
+        <div class="section-header">
+            <div class="header-columns">
+                <div class="col-name">Fun Military Skull Gun</div>
+                <div class="col-progress"><div class="progress-container"><div class="progress-bar"></div></div></div>
+                <div class="col-reward"><strong>Reward:</strong> Parallax 'Fun Military Skull' Energy Assault Rifle</div>
+            </div>
+        </div>
+        <div class="section-content">
+            <button class="reset-btn" onclick="resetProgress('fun-military-skull-gun')">Reset Progress</button>
+            <table>
+                <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+                <tbody>
+                    <tr><td data-tooltip="Raw ore from mining">Jaclium (Ore)</td><td>20</td><td class="collected"><input type="number" min="0" data-id="fun-military-jaclium"></td><td class="complete"><input type="checkbox" data-id="fun-military-jaclium-done"></td></tr>
+                    <tr><td data-tooltip="Raw ore from mining">Saldynium (Ore)</td><td>15</td><td class="collected"><input type="number" min="0" data-id="fun-military-saldynium"></td><td class="complete"><input type="checkbox" data-id="fun-military-saldynium-done"></td></tr>
+                    <tr><td data-tooltip="Raw ore from mining">Carinite</td><td>10</td><td class="collected"><input type="number" min="0" data-id="fun-military-carinite"></td><td class="complete"><input type="checkbox" data-id="fun-military-carinite-done"></td></tr>
+                    <tr><td data-tooltip="Base weapon required">Parallax Energy Assault Rifle</td><td>1</td><td class="collected"><input type="number" min="0" data-id="fun-military-parallax"></td><td class="complete"><input type="checkbox" data-id="fun-military-parallax-done"></td></tr>
+                    <tr><td data-tooltip="Irradiated loot">Irradiated Valakkar Fang (Juvenile)</td><td>20</td><td class="collected"><input type="number" min="0" data-id="fun-military-fang-juvenile"></td><td class="complete"><input type="checkbox" data-id="fun-military-fang-juvenile-done"></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="section" id="misc-fortune">
+        <div class="section-header">
+            <div class="header-columns">
+                <div class="col-name">Fortune ship for you</div>
+                <div class="col-progress"><div class="progress-container"><div class="progress-bar"></div></div></div>
+                <div class="col-reward"><strong>Reward:</strong> Misc Fortune</div>
+            </div>
+        </div>
+        <div class="section-content">
+            <button class="reset-btn" onclick="resetProgress('misc-fortune')">Reset Progress</button>
+            <table>
+                <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+                <tbody>
+                    <tr><td data-tooltip="Earned from Wikelo contracts/missions">Wikelo Favor</td><td>3</td><td class="collected"><input type="number" min="0" data-id="misc-fortune-wikelo-favor"></td><td class="complete"><input type="checkbox" data-id="misc-fortune-wikelo-favor-done"></td></tr>
+                    <tr><td data-tooltip="Refined from Carinite ore">Carinite (Pure)</td><td>1</td><td class="collected"><input type="number" min="0" data-id="misc-fortune-carinite-pure"></td><td class="complete"><input type="checkbox" data-id="misc-fortune-carinite-pure-done"></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="section" id="prism-irradiated">
+        <div class="section-header">
+            <div class="header-columns">
+                <div class="col-name">Make VOLT shotgun angrier</div>
+                <div class="col-progress"><div class="progress-container"><div class="progress-bar"></div></div></div>
+                <div class="col-reward"><strong>Reward:</strong> Prism 'Irradiated' Laser Shotgun</div>
+            </div>
+        </div>
+        <div class="section-content">
+            <button class="reset-btn" onclick="resetProgress('prism-irradiated')">Reset Progress</button>
+            <table>
+                <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+                <tbody>
+                    <tr><td data-tooltip="Earned from Wikelo contracts/missions">Wikelo Favor</td><td>1</td><td class="collected"><input type="number" min="0" data-id="prism-wikelo-favor"></td><td class="complete"><input type="checkbox" data-id="prism-wikelo-favor-done"></td></tr>
+                    <tr><td data-tooltip="Base weapon required">Prism Laser Shotgun</td><td>1</td><td class="collected"><input type="number" min="0" data-id="prism-prism-shotgun"></td><td class="complete"><input type="checkbox" data-id="prism-prism-shotgun-done"></td></tr>
+                    <tr><td data-tooltip="Irradiated loot">Irradiated Valakkar Fang (Juvenile)</td><td>10</td><td class="collected"><input type="number" min="0" data-id="prism-fang-juvenile"></td><td class="complete"><input type="checkbox" data-id="prism-fang-juvenile-done"></td></tr>
+                    <tr><td data-tooltip="Irradiated loot">Irradiated Valakkar Fang (Adult)</td><td>5</td><td class="collected"><input type="number" min="0" data-id="prism-fang-adult"></td><td class="complete"><input type="checkbox" data-id="prism-fang-adult-done"></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="section" id="zenith-snow-camo">
+        <div class="section-header">
+            <div class="header-columns">
+                <div class="col-name">Snow Snipe</div>
+                <div class="col-progress"><div class="progress-container"><div class="progress-bar"></div></div></div>
+                <div class="col-reward"><strong>Reward:</strong> Zenith 'Snow Camo' Laser Sniper Rifle</div>
+            </div>
+        </div>
+        <div class="section-content">
+            <button class="reset-btn" onclick="resetProgress('zenith-snow-camo')">Reset Progress</button>
+            <table>
+                <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+                <tbody>
+                    <tr><td data-tooltip="Rewards from investigation missions in the ASD facilities">ASD Secure Drive</td><td>7</td><td class="collected"><input type="number" min="0" data-id="zenith-snow-asd"></td><td class="complete"><input type="checkbox" data-id="zenith-snow-asd-done"></td></tr>
+                    <tr><td data-tooltip="Base weapon required">Zenith Sniper Rifle</td><td>1</td><td class="collected"><input type="number" min="0" data-id="zenith-snow-zenith"></td><td class="complete"><input type="checkbox" data-id="zenith-snow-zenith-done"></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+	<!-- Hide Snow Suit (Geist Snow Camo Set) -->
+<div class="section" id="hide-snow-suit">
+    <div class="section-header">
+        <div class="header-columns">
+            <div class="col-name">Hide Snow Suit</div>
+            <div class="col-progress">
+                <div class="progress-container"><div class="progress-bar"></div></div>
+            </div>
+            <div class="col-reward"><strong>Reward:</strong> Geist Snow Camo Set</div>
+        </div>
+    </div>
+    <div class="section-content">
+        <button class="reset-btn" onclick="resetProgress('hide-snow-suit')">Reset Progress</button>
+        <table>
+            <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+            <tbody>
+                <tr><td data-tooltip="Rewards from investigation missions in the ASD facilities">ASD Secure Drive</td><td>4</td><td class="collected"><input type="number" min="0" data-id="snow-asd"></td><td class="complete"><input type="checkbox" data-id="snow-asd-done"></td></tr>
+                <tr><td data-tooltip="Armor piece from Geist set">Geist ASD Helmet</td><td>1</td><td class="collected"><input type="number" min="0" data-id="snow-helmet"></td><td class="complete"><input type="checkbox" data-id="snow-helmet-done"></td></tr>
+                <tr><td data-tooltip="Armor piece from Geist set">Geist ASD Core</td><td>1</td><td class="collected"><input type="number" min="0" data-id="snow-core"></td><td class="complete"><input type="checkbox" data-id="snow-core-done"></td></tr>
+                <tr><td data-tooltip="Armor piece from Geist set">Geist ASD Legs</td><td>1</td><td class="collected"><input type="number" min="0" data-id="snow-legs"></td><td class="complete"><input type="checkbox" data-id="snow-legs-done"></td></tr>
+                <tr><td data-tooltip="Armor piece from Geist set">Geist ASD Arms</td><td>1</td><td class="collected"><input type="number" min="0" data-id="snow-arms"></td><td class="complete"><input type="checkbox" data-id="snow-arms-done"></td></tr>
+                <tr><td data-tooltip="Armor piece from Geist set">Geist ASD Backpack</td><td>1</td><td class="collected"><input type="number" min="0" data-id="snow-backpack"></td><td class="complete"><input type="checkbox" data-id="snow-backpack-done"></td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Onyx Yormandi Gun -->
+<div class="section" id="yormandi-gun">
+    <div class="section-header">
+        <div class="header-columns">
+            <div class="col-name">Yormandi Gun</div>
+            <div class="col-progress">
+                <div class="progress-container"><div class="progress-bar"></div></div>
+            </div>
+            <div class="col-reward"><strong>Reward:</strong> Fresnel 'Yormandi' LMG</div>
+        </div>
+    </div>
+    <div class="section-content">
+        <button class="reset-btn" onclick="resetProgress('yormandi-gun')">Reset Progress</button>
+        <table>
+            <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+            <tbody>
+                <tr><td data-tooltip="Base weapon required">Fresnel Energy LMG</td><td>1</td><td class="collected"><input type="number" min="0" data-id="yormandi-fresnel"></td><td class="complete"><input type="checkbox" data-id="yormandi-fresnel-done"></td></tr>
+                <tr><td data-tooltip="Yormandi loot">Yormandi Eye</td><td>6</td><td class="collected"><input type="number" min="0" data-id="yormandi-eye"></td><td class="complete"><input type="checkbox" data-id="yormandi-eye-done"></td></tr>
+                <tr><td data-tooltip="Yormandi loot">Yormandi Tongue</td><td>3</td><td class="collected"><input type="number" min="0" data-id="yormandi-tongue"></td><td class="complete"><input type="checkbox" data-id="yormandi-tongue-done"></td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Palatino Mark 1 Set -->
+<div class="section" id="palatino-mark-1-set">
+    <div class="section-header">
+        <div class="header-columns">
+            <div class="col-name">Test Armor</div>
+            <div class="col-progress">
+                <div class="progress-container"><div class="progress-bar"></div></div>
+            </div>
+            <div class="col-reward"><strong>Reward:</strong> Palatino Mark 1 Set</div>
+        </div>
+    </div>
+    <div class="section-content">
+        <button class="reset-btn" onclick="resetProgress('palatino-mark-1-set')">Reset Progress</button>
+        <table>
+            <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+            <tbody>
+                <tr><td data-tooltip="Armor piece">Palatino Helmet</td><td>1</td><td class="collected"><input type="number" min="0" data-id="palatino-helmet"></td><td class="complete"><input type="checkbox" data-id="palatino-helmet-done"></td></tr>
+                <tr><td data-tooltip="Armor piece">Palatino Core</td><td>1</td><td class="collected"><input type="number" min="0" data-id="palatino-core"></td><td class="complete"><input type="checkbox" data-id="palatino-core-done"></td></tr>
+                <tr><td data-tooltip="Armor piece">Palatino Legs</td><td>1</td><td class="collected"><input type="number" min="0" data-id="palatino-legs"></td><td class="complete"><input type="checkbox" data-id="palatino-legs-done"></td></tr>
+                <tr><td data-tooltip="Armor piece">Palatino Arms</td><td>1</td><td class="collected"><input type="number" min="0" data-id="palatino-arms"></td><td class="complete"><input type="checkbox" data-id="palatino-arms-done"></td></tr>
+                <tr><td data-tooltip="Backpack piece">Palatino Backpack</td><td>1</td><td class="collected"><input type="number" min="0" data-id="palatino-backpack"></td><td class="complete"><input type="checkbox" data-id="palatino-backpack-done"></td></tr>
+                <tr><td data-tooltip="Yormandi loot">Yormandi Eye</td><td>14</td><td class="collected"><input type="number" min="0" data-id="palatino-yormandi-eye"></td><td class="complete"><input type="checkbox" data-id="palatino-yormandi-eye-done"></td></tr>
+                <tr><td data-tooltip="Yormandi loot">Yormandi Tongue</td><td>7</td><td class="collected"><input type="number" min="0" data-id="palatino-yormandi-tongue"></td><td class="complete"><input type="checkbox" data-id="palatino-yormandi-tongue-done"></td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Testudo 'Clanguard' Set -->
+<div class="section" id="testudo-clanguard-set">
+    <div class="section-header">
+        <div class="header-columns">
+            <div class="col-name">Armor with Vanduul</div>
+            <div class="col-progress">
+                <div class="progress-container"><div class="progress-bar"></div></div>
+            </div>
+            <div class="col-reward"><strong>Reward:</strong> Testudo 'Clanguard' Set</div>
+        </div>
+    </div>
+    <div class="section-content">
+        <button class="reset-btn" onclick="resetProgress('testudo-clanguard-set')">Reset Progress</button>
+        <table>
+            <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+            <tbody>
+                <tr><td data-tooltip="Armor piece">Testudo Turfwar Helmet</td><td>1</td><td class="collected"><input type="number" min="0" data-id="testudo-helmet"></td><td class="complete"><input type="checkbox" data-id="testudo-helmet-done"></td></tr>
+                <tr><td data-tooltip="Armor piece">Testudo Turfwar Core</td><td>1</td><td class="collected"><input type="number" min="0" data-id="testudo-core"></td><td class="complete"><input type="checkbox" data-id="testudo-core-done"></td></tr>
+                <tr><td data-tooltip="Armor piece">Testudo Turfwar Arms</td><td>1</td><td class="collected"><input type="number" min="0" data-id="testudo-arms"></td><td class="complete"><input type="checkbox" data-id="testudo-arms-done"></td></tr>
+                <tr><td data-tooltip="Armor piece">Testudo Turfwar Legs</td><td>1</td><td class="collected"><input type="number" min="0" data-id="testudo-legs"></td><td class="complete"><input type="checkbox" data-id="testudo-legs-done"></td></tr>
+                <tr><td data-tooltip="Backpack piece">Testudo Turfwar Backpack</td><td>1</td><td class="collected"><input type="number" min="0" data-id="testudo-backpack"></td><td class="complete"><input type="checkbox" data-id="testudo-backpack-done"></td></tr>
+                <tr><td data-tooltip="Loot from Vanduul wrecks or events">Vanduul Plating</td><td>15</td><td class="collected"><input type="number" min="0" data-id="testudo-vanduul-plating"></td><td class="complete"><input type="checkbox" data-id="testudo-vanduul-plating-done"></td></tr>
+                <tr><td data-tooltip="Loot from Vanduul wrecks or events">Vanduul Metal</td><td>15</td><td class="collected"><input type="number" min="0" data-id="testudo-vanduul-metal"></td><td class="complete"><input type="checkbox" data-id="testudo-vanduul-metal-done"></td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="section" id="trade-merc-scrip-for-favors">
+    <div class="section-header">
+        <div class="header-columns">
+            <div class="col-name">Trade Merc Scrip for Favors</div>
+            <div class="col-progress"><div class="progress-container"><div class="progress-bar"></div></div></div>
+            <div class="col-reward"><strong>Reward:</strong> 1x Wikelo Favor for 50x MG Scrip</div>
+        </div>
+    </div>
+    <div class="section-content">
+        <button class="reset-btn" onclick="resetProgress('trade-merc-scrip-for-favors')">Reset Progress</button>
+        <table>
+            <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+            <tbody>
+                <tr><td data-tooltip="Loot from merc missions">MG Scrip</td><td>50</td><td class="collected"><input type="number" min="0" data-id="merc-scrip-mg"></td><td class="complete"><input type="checkbox" data-id="merc-scrip-mg-done"></td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<!-- Trade Council Scrip for Favors -->
+<div class="section" id="trade-council-scrip-for-favors">
+    <div class="section-header">
+        <div class="header-columns">
+            <div class="col-name">Trade Council Scrip for Favors</div>
+            <div class="col-progress">
+                <div class="progress-container"><div class="progress-bar"></div></div>
+            </div>
+            <div class="col-reward"><strong>Reward:</strong> 1× Wikelo Favor for 50× Council Scrip</div>
+        </div>
+    </div>
+    <div class="section-content">
+        <button class="reset-btn" onclick="resetProgress('trade-council-scrip-for-favors')">Reset Progress</button>
+        <table>
+            <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+            <tbody>
+                <tr><td data-tooltip="Scrip from council-related activities">Council Scrip</td><td>50</td><td class="collected"><input type="number" min="0" data-id="council-scrip"></td><td class="complete"><input type="checkbox" data-id="council-scrip-done"></td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Turn Things to Favor -->
+<div class="section" id="turn-things-to-favor">
+    <div class="section-header">
+        <div class="header-columns">
+            <div class="col-name">Turn Things to Favor</div>
+            <div class="col-progress">
+                <div class="progress-container"><div class="progress-bar"></div></div>
+            </div>
+            <div class="col-reward"><strong>Reward:</strong> 1× Wikelo Favor for 50× Carinite</div>
+        </div>
+    </div>
+    <div class="section-content">
+        <button class="reset-btn" onclick="resetProgress('turn-things-to-favor')">Reset Progress</button>
+        <table>
+            <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+            <tbody>
+                <tr><td data-tooltip="Raw ore from mining">Carinite</td><td>50</td><td class="collected"><input type="number" min="0" data-id="turn-carinite"></td><td class="complete"><input type="checkbox" data-id="turn-carinite-done"></td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Trade Worm Parts for Favors -->
+<div class="section" id="trade-worm-parts-for-favors">
+    <div class="section-header">
+        <div class="header-columns">
+            <div class="col-name">Trade Worm Parts for Favors</div>
+            <div class="col-progress">
+                <div class="progress-container"><div class="progress-bar"></div></div>
+            </div>
+            <div class="col-reward"><strong>Reward:</strong> 1× Wikelo Favor</div>
+        </div>
+    </div>
+    <div class="section-content">
+        <button class="reset-btn" onclick="resetProgress('trade-worm-parts-for-favors')">Reset Progress</button>
+        <table>
+            <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+            <tbody>
+                <tr><td data-tooltip="From Hathor / worm-related activities">Irradiated Valakkar Pearl (AA)</td><td>12</td><td class="collected"><input type="number" min="0" data-id="worm-pearl-aa"></td><td class="complete"><input type="checkbox" data-id="worm-pearl-aa-done"></td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Want Polaris? Need something special -->
+<div class="section" id="want-polaris">
+    <div class="section-header">
+        <div class="header-columns">
+            <div class="col-name">Want Polaris? Need something special</div>
+            <div class="col-progress">
+                <div class="progress-container"><div class="progress-bar"></div></div>
+            </div>
+            <div class="col-reward"><strong>Reward:</strong> 1× Polaris Bit for 24scu of Quantainium</div>
+        </div>
+    </div>
+    <div class="section-content">
+        <button class="reset-btn" onclick="resetProgress('want-polaris')">Reset Progress</button>
+        <table>
+            <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+            <tbody>
+                <tr><td data-tooltip="Raw ore from mining">Quantainium</td><td>24</td><td class="collected"><input type="number" min="0" data-id="polaris-quantainium"></td><td class="complete"><input type="checkbox" data-id="polaris-quantainium-done"></td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Onyx Yormandi Gun -->
+<div class="section" id="onyx-yormandi-gun">
+    <div class="section-header">
+        <div class="header-columns">
+            <div class="col-name">Onyx Yormandi Gun</div>
+            <div class="col-progress">
+                <div class="progress-container"><div class="progress-bar"></div></div>
+            </div>
+            <div class="col-reward"><strong>Reward:</strong> Fresnel 'Yormandi' LMG</div>
+        </div>
+    </div>
+    <div class="section-content">
+        <button class="reset-btn" onclick="resetProgress('onyx-yormandi-gun')">Reset Progress</button>
+        <table>
+            <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+            <tbody>
+                <tr><td data-tooltip="Base weapon required">Fresnel Energy LMG</td><td>1</td><td class="collected"><input type="number" min="0" data-id="yormandi-fresnel"></td><td class="complete"><input type="checkbox" data-id="yormandi-fresnel-done"></td></tr>
+                <tr><td data-tooltip="Yormandi loot">Yormandi Eye</td><td>6</td><td class="collected"><input type="number" min="0" data-id="yormandi-eye"></td><td class="complete"><input type="checkbox" data-id="yormandi-eye-done"></td></tr>
+                <tr><td data-tooltip="Yormandi loot">Yormandi Tongue</td><td>3</td><td class="collected"><input type="number" min="0" data-id="yormandi-tongue"></td><td class="complete"><input type="checkbox" data-id="yormandi-tongue-done"></td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Ana Armor Endro Set -->
+<div class="section" id="ana-armor-endro-set">
+    <div class="section-header">
+        <div class="header-columns">
+            <div class="col-name">Armor with horn and string</div>
+            <div class="col-progress">
+                <div class="progress-container"><div class="progress-bar"></div></div>
+            </div>
+            <div class="col-reward"><strong>Reward:</strong> Ana Armor Endro Set</div>
+        </div>
+    </div>
+    <div class="section-content">
+        <button class="reset-btn" onclick="resetProgress('ana-armor-endro-set')">Reset Progress</button>
+        <table>
+            <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+            <tbody>
+                <tr><td data-tooltip="Refined from Carinite ore">Carinite (Pure)</td><td>1</td><td class="collected"><input type="number" min="0" data-id="ana-carinite-pure"></td><td class="complete"><input type="checkbox" data-id="ana-carinite-pure-done"></td></tr>
+                <tr><td data-tooltip="Armor piece">Antium Core</td><td>1</td><td class="collected"><input type="number" min="0" data-id="ana-antium-core"></td><td class="complete"><input type="checkbox" data-id="ana-antium-core-done"></td></tr>
+                <tr><td data-tooltip="Armor piece">Antium Helmet</td><td>1</td><td class="collected"><input type="number" min="0" data-id="ana-antium-helmet"></td><td class="complete"><input type="checkbox" data-id="ana-antium-helmet-done"></td></tr>
+                <tr><td data-tooltip="Armor piece">Antium Legs</td><td>1</td><td class="collected"><input type="number" min="0" data-id="ana-antium-legs"></td><td class="complete"><input type="checkbox" data-id="ana-antium-legs-done"></td></tr>
+                <tr><td data-tooltip="Armor piece">Antium Arms</td><td>1</td><td class="collected"><input type="number" min="0" data-id="ana-antium-arms"></td><td class="complete"><input type="checkbox" data-id="ana-antium-arms-done"></td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<!-- ATLS IKTI -->
+<div class="section" id="atls-ikti">
+    <div class="section-header">
+        <div class="header-columns">
+            <div class="col-name">Make ATLS shoot</div>
+            <div class="col-progress">
+                <div class="progress-container"><div class="progress-bar"></div></div>
+            </div>
+            <div class="col-reward"><strong>Reward:</strong> ATLS IKTI</div>
+        </div>
+    </div>
+    <div class="section-content">
+        <button class="reset-btn" onclick="resetProgress('atls-ikti')">Reset Progress</button>
+        <table>
+            <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+            <tbody>
+                <tr><td data-tooltip="Base vehicle required">Argo ATLS</td><td>1</td><td class="collected"><input type="number" min="0" data-id="ikti-argo-atls"></td><td class="complete"><input type="checkbox" data-id="ikti-argo-atls-done"></td></tr>
+                <tr><td data-tooltip="Earned from Wikelo contracts/missions">Wikelo Favor</td><td>2</td><td class="collected"><input type="number" min="0" data-id="ikti-wikelo-favor"></td><td class="complete"><input type="checkbox" data-id="ikti-wikelo-favor-done"></td></tr>
+                <tr><td data-tooltip="Rare irradiated item">Irradiated Valakkar Fang (Apex)</td><td>5</td><td class="collected"><input type="number" min="0" data-id="ikti-fang-apex"></td><td class="complete"><input type="checkbox" data-id="ikti-fang-apex-done"></td></tr>
+                <tr><td data-tooltip="Weapon attachment">NN-13 Cannon</td><td>2</td><td class="collected"><input type="number" min="0" data-id="ikti-nn13"></td><td class="complete"><input type="checkbox" data-id="ikti-nn13-done"></td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Pulse Plus -->
+<div class="section" id="pulse-plus">
+    <div class="section-header">
+        <div class="header-columns">
+            <div class="col-name">Pulse Plus</div>
+            <div class="col-progress">
+                <div class="progress-container"><div class="progress-bar"></div></div>
+            </div>
+            <div class="col-reward"><strong>Reward:</strong> Mirai Pulse</div>
+        </div>
+    </div>
+    <div class="section-content">
+        <button class="reset-btn" onclick="resetProgress('pulse-plus')">Reset Progress</button>
+        <table>
+            <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+            <tbody>
+                <tr><td data-tooltip="Earned from Wikelo contracts/missions">Wikelo Favor</td><td>4</td><td class="collected"><input type="number" min="0" data-id="pulse-wikelo-favor"></td><td class="complete"><input type="checkbox" data-id="pulse-wikelo-favor-done"></td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Ursa Medivac -->
+<div class="section" id="ursa-medivac">
+    <div class="section-header">
+        <div class="header-columns">
+            <div class="col-name">Make a Ursa Mod</div>
+            <div class="col-progress">
+                <div class="progress-container"><div class="progress-bar"></div></div>
+            </div>
+            <div class="col-reward"><strong>Reward:</strong> Ursa Medivac</div>
+        </div>
+    </div>
+    <div class="section-content">
+        <button class="reset-btn" onclick="resetProgress('ursa-medivac')">Reset Progress</button>
+        <table>
+            <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+            <tbody>
+                <tr><td data-tooltip="Earned from Wikelo contracts/missions">Wikelo Favor</td><td>4</td><td class="collected"><input type="number" min="0" data-id="ursa-wikelo-favor"></td><td class="complete"><input type="checkbox" data-id="ursa-wikelo-favor-done"></td></tr>
+                <tr><td data-tooltip="Raw ore from mining">Saldynium (Ore)</td><td>20</td><td class="collected"><input type="number" min="0" data-id="ursa-saldynium"></td><td class="complete"><input type="checkbox" data-id="ursa-saldynium-done"></td></tr>
+                <tr><td data-tooltip="Raw ore from mining">Jaclium (Ore)</td><td>20</td><td class="collected"><input type="number" min="0" data-id="ursa-jaclium"></td><td class="complete"><input type="checkbox" data-id="ursa-jaclium-done"></td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Upgrade Intrepid -->
+<div class="section" id="upgrade-intrepid">
+    <div class="section-header">
+        <div class="header-columns">
+            <div class="col-name">Upgrade Intrepid</div>
+            <div class="col-progress">
+                <div class="progress-container"><div class="progress-bar"></div></div>
+            </div>
+            <div class="col-reward"><strong>Reward:</strong> Crusader Intrepid</div>
+        </div>
+    </div>
+    <div class="section-content">
+        <button class="reset-btn" onclick="resetProgress('upgrade-intrepid')">Reset Progress</button>
+        <table>
+            <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+            <tbody>
+                <tr><td data-tooltip="Rare pristine item from events/loot">Government Cartography Agency Medal (Pristine)</td><td>1</td><td class="collected"><input type="number" min="0" data-id="intrepid-gca-medal"></td><td class="complete"><input type="checkbox" data-id="intrepid-gca-medal-done"></td></tr>
+                <tr><td data-tooltip="Earned from Wikelo contracts/missions">Wikelo Favor</td><td>3</td><td class="collected"><input type="number" min="0" data-id="intrepid-wikelo-favor"></td><td class="complete"><input type="checkbox" data-id="intrepid-wikelo-favor-done"></td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Spirit cargo mod -->
+<div class="section" id="spirit-cargo-mod">
+    <div class="section-header">
+        <div class="header-columns">
+            <div class="col-name">Spirit cargo mod</div>
+            <div class="col-progress">
+                <div class="progress-container"><div class="progress-bar"></div></div>
+            </div>
+            <div class="col-reward"><strong>Reward:</strong> Crusader C1 Spirit</div>
+        </div>
+    </div>
+    <div class="section-content">
+        <button class="reset-btn" onclick="resetProgress('spirit-cargo-mod')">Reset Progress</button>
+        <table>
+            <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+            <tbody>
+                <tr><td data-tooltip="Earned from Wikelo contracts/missions">Wikelo Favor</td><td>8</td><td class="collected"><input type="number" min="0" data-id="spirit-wikelo-favor"></td><td class="complete"><input type="checkbox" data-id="spirit-wikelo-favor-done"></td></tr>
+                <tr><td data-tooltip="Rare pristine item from events/loot">Tevarin War Service Marker (Pristine)</td><td>1</td><td class="collected"><input type="number" min="0" data-id="spirit-tevarin-marker"></td><td class="complete"><input type="checkbox" data-id="spirit-tevarin-marker-done"></td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Zeus Mk2 ES -->
+<div class="section" id="zeus-mk2-es">
+    <div class="section-header">
+        <div class="header-columns">
+            <div class="col-name">Zeus Special</div>
+            <div class="col-progress">
+                <div class="progress-container"><div class="progress-bar"></div></div>
+            </div>
+            <div class="col-reward"><strong>Reward:</strong> Zeus Mk2 ES</div>
+        </div>
+    </div>
+    <div class="section-content">
+        <button class="reset-btn" onclick="resetProgress('zeus-mk2-es')">Reset Progress</button>
+        <table>
+            <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+            <tbody>
+                <tr><td data-tooltip="Earned from Wikelo contracts/missions">Wikelo Favor</td><td>10</td><td class="collected"><input type="number" min="0" data-id="zeus-es-wikelo-favor"></td><td class="complete"><input type="checkbox" data-id="zeus-es-wikelo-favor-done"></td></tr>
+                <tr><td data-tooltip="Rare pristine item from events/loot">UEE 6th Platoon Medal (Pristine)</td><td>1</td><td class="collected"><input type="number" min="0" data-id="zeus-es-uee-medal"></td><td class="complete"><input type="checkbox" data-id="zeus-es-uee-medal-done"></td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Starlancer Max -->
+<div class="section" id="starlancer-max">
+    <div class="section-header">
+        <div class="header-columns">
+            <div class="col-name">More than a max</div>
+            <div class="col-progress">
+                <div class="progress-container"><div class="progress-bar"></div></div>
+            </div>
+            <div class="col-reward"><strong>Reward:</strong> Starlancer Max</div>
+        </div>
+    </div>
+    <div class="section-content">
+        <button class="reset-btn" onclick="resetProgress('starlancer-max')">Reset Progress</button>
+        <table>
+            <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+            <tbody>
+                <tr><td data-tooltip="Earned from Wikelo contracts/missions">Wikelo Favor</td><td>30</td><td class="collected"><input type="number" min="0" data-id="starlancer-max-wikelo-favor"></td><td class="complete"><input type="checkbox" data-id="starlancer-max-wikelo-favor-done"></td></tr>
+                <tr><td data-tooltip="Helmet from Ace series">Ace Interceptor Helmet</td><td>10</td><td class="collected"><input type="number" min="0" data-id="starlancer-max-ace-helmet"></td><td class="complete"><input type="checkbox" data-id="starlancer-max-ace-helmet-done"></td></tr>
+                <tr><td data-tooltip="Refined from Carinite ore">Carinite (Pure)</td><td>3</td><td class="collected"><input type="number" min="0" data-id="starlancer-max-carinite-pure"></td><td class="complete"><input type="checkbox" data-id="starlancer-max-carinite-pure-done"></td></tr>
+                <tr><td data-tooltip="Rare irradiated item">Irradiated Valakkar Pearl (AAA)</td><td>3</td><td class="collected"><input type="number" min="0" data-id="starlancer-max-pearl-aaa"></td><td class="complete"><input type="checkbox" data-id="starlancer-max-pearl-aaa-done"></td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Sabre Peregrine -->
+<div class="section" id="sabre-peregrine">
+    <div class="section-header">
+        <div class="header-columns">
+            <div class="col-name">Peregrine Wikelo Mod</div>
+            <div class="col-progress">
+                <div class="progress-container"><div class="progress-bar"></div></div>
+            </div>
+            <div class="col-reward"><strong>Reward:</strong> Sabre Peregrine</div>
+        </div>
+    </div>
+    <div class="section-content">
+        <button class="reset-btn" onclick="resetProgress('sabre-peregrine')">Reset Progress</button>
+        <table>
+            <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+            <tbody>
+                <tr><td data-tooltip="Earned from Wikelo contracts/missions">Wikelo Favor</td><td>4</td><td class="collected"><input type="number" min="0" data-id="peregrine-wikelo-favor"></td><td class="complete"><input type="checkbox" data-id="peregrine-wikelo-favor-done"></td></tr>
+                <tr><td data-tooltip="Loot from orbital stations">DCHS-05 Orbital Positioning Comp-Board</td><td>1</td><td class="collected"><input type="number" min="0" data-id="peregrine-dchs"></td><td class="complete"><input type="checkbox" data-id="peregrine-dchs-done"></td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Sabre Firebird -->
+<div class="section" id="sabre-firebird">
+    <div class="section-header">
+        <div class="header-columns">
+            <div class="col-name">Firebird Mod</div>
+            <div class="col-progress">
+                <div class="progress-container"><div class="progress-bar"></div></div>
+            </div>
+            <div class="col-reward"><strong>Reward:</strong> Sabre Firebird</div>
+        </div>
+    </div>
+    <div class="section-content">
+        <button class="reset-btn" onclick="resetProgress('sabre-firebird')">Reset Progress</button>
+        <table>
+            <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+            <tbody>
+                <tr><td data-tooltip="Earned from Wikelo contracts/missions">Wikelo Favor</td><td>15</td><td class="collected"><input type="number" min="0" data-id="firebird-wikelo-favor"></td><td class="complete"><input type="checkbox" data-id="firebird-wikelo-favor-done"></td></tr>
+                <tr><td data-tooltip="Rare pristine item">Government Cartography Agency Medal (Pristine)</td><td>1</td><td class="collected"><input type="number" min="0" data-id="firebird-gca-medal"></td><td class="complete"><input type="checkbox" data-id="firebird-gca-medal-done"></td></tr>
+                <tr><td data-tooltip="Loot from orbital stations">DCHS-05 Orbital Positioning Comp-Board</td><td>4</td><td class="collected"><input type="number" min="0" data-id="firebird-dchs"></td><td class="complete"><input type="checkbox" data-id="firebird-dchs-done"></td></tr>
+                <tr><td data-tooltip="Helmet from Ace series">Ace Interceptor Helmet</td><td>3</td><td class="collected"><input type="number" min="0" data-id="firebird-ace-helmet"></td><td class="complete"><input type="checkbox" data-id="firebird-ace-helmet-done"></td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Guardian QI -->
+<div class="section" id="guardian-qi">
+    <div class="section-header">
+        <div class="header-columns">
+            <div class="col-name">Guardian take down ship</div>
+            <div class="col-progress">
+                <div class="progress-container"><div class="progress-bar"></div></div>
+            </div>
+            <div class="col-reward"><strong>Reward:</strong> Guardian QI</div>
+        </div>
+    </div>
+    <div class="section-content">
+        <button class="reset-btn" onclick="resetProgress('guardian-qi')">Reset Progress</button>
+        <table>
+            <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+            <tbody>
+                <tr><td data-tooltip="Earned from Wikelo contracts/missions">Wikelo Favor</td><td>25</td><td class="collected"><input type="number" min="0" data-id="guardian-qi-wikelo-favor"></td><td class="complete"><input type="checkbox" data-id="guardian-qi-wikelo-favor-done"></td></tr>
+                <tr><td data-tooltip="Rare irradiated item">Irradiated Valakkar Pearl (AA)</td><td>15</td><td class="collected"><input type="number" min="0" data-id="guardian-qi-pearl-aa"></td><td class="complete"><input type="checkbox" data-id="guardian-qi-pearl-aa-done"></td></tr>
+                <tr><td data-tooltip="Loot from orbital stations">DCHS-05 Orbital Positioning Comp-Board</td><td>15</td><td class="collected"><input type="number" min="0" data-id="guardian-qi-dchs"></td><td class="complete"><input type="checkbox" data-id="guardian-qi-dchs-done"></td></tr>
+                <tr><td data-tooltip="Rare pristine item">UEE 6th Platoon Medal (Pristine)</td><td>2</td><td class="collected"><input type="number" min="0" data-id="guardian-qi-uee-medal"></td><td class="complete"><input type="checkbox" data-id="guardian-qi-uee-medal-done"></td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Guardian MX -->
+<div class="section" id="guardian-mx">
+    <div class="section-header">
+        <div class="header-columns">
+            <div class="col-name">Guardian Wik-X</div>
+            <div class="col-progress">
+                <div class="progress-container"><div class="progress-bar"></div></div>
+            </div>
+            <div class="col-reward"><strong>Reward:</strong> Guardian MX</div>
+        </div>
+    </div>
+    <div class="section-content">
+        <button class="reset-btn" onclick="resetProgress('guardian-mx')">Reset Progress</button>
+        <table>
+            <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+            <tbody>
+                <tr><td data-tooltip="Earned from Wikelo contracts/missions">Wikelo Favor</td><td>25</td><td class="collected"><input type="number" min="0" data-id="guardian-mx-wikelo-favor"></td><td class="complete"><input type="checkbox" data-id="guardian-mx-wikelo-favor-done"></td></tr>
+                <tr><td data-tooltip="Helmet from Ace series">Ace Interceptor Helmet</td><td>15</td><td class="collected"><input type="number" min="0" data-id="guardian-mx-ace-helmet"></td><td class="complete"><input type="checkbox" data-id="guardian-mx-ace-helmet-done"></td></tr>
+                <tr><td data-tooltip="Rare pristine item">Large Artefact Fragment (Pristine)</td><td>2</td><td class="collected"><input type="number" min="0" data-id="guardian-mx-artefact"></td><td class="complete"><input type="checkbox" data-id="guardian-mx-artefact-done"></td></tr>
+                <tr><td data-tooltip="Vanduul loot">Vanduul Plating</td><td>30</td><td class="collected"><input type="number" min="0" data-id="guardian-mx-vanduul-plating"></td><td class="complete"><input type="checkbox" data-id="guardian-mx-vanduul-plating-done"></td></tr>
+                <tr><td data-tooltip="Vanduul loot">Vanduul Metal</td><td>30</td><td class="collected"><input type="number" min="0" data-id="guardian-mx-vanduul-metal"></td><td class="complete"><input type="checkbox" data-id="guardian-mx-vanduul-metal-done"></td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Anvil Terrapin Medic -->
+<div class="section" id="anvil-terrapin-medic">
+    <div class="section-header">
+        <div class="header-columns">
+            <div class="col-name">What is Terrapin?</div>
+            <div class="col-progress">
+                <div class="progress-container"><div class="progress-bar"></div></div>
+            </div>
+            <div class="col-reward"><strong>Reward:</strong> Anvil Terrapin Medic</div>
+        </div>
+    </div>
+    <div class="section-content">
+        <button class="reset-btn" onclick="resetProgress('anvil-terrapin-medic')">Reset Progress</button>
+        <table>
+            <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+            <tbody>
+                <tr><td data-tooltip="Earned from Wikelo contracts/missions">Wikelo Favor</td><td>15</td><td class="collected"><input type="number" min="0" data-id="terrapin-wikelo-favor"></td><td class="complete"><input type="checkbox" data-id="terrapin-wikelo-favor-done"></td></tr>
+                <tr><td data-tooltip="Rewards from investigation missions in the ASD facilities">ASD Secure Drive</td><td>10</td><td class="collected"><input type="number" min="0" data-id="terrapin-asd"></td><td class="complete"><input type="checkbox" data-id="terrapin-asd-done"></td></tr>
+                <tr><td data-tooltip="Rare pristine item">Tevarin War Service Marker (Pristine)</td><td>1</td><td class="collected"><input type="number" min="0" data-id="terrapin-tevarin"></td><td class="complete"><input type="checkbox" data-id="terrapin-tevarin-done"></td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Misc Starlancer Tac -->
+<div class="section" id="misc-starlancer-tac">
+    <div class="section-header">
+        <div class="header-columns">
+            <div class="col-name">New Move Big Starlancer Ship</div>
+            <div class="col-progress">
+                <div class="progress-container"><div class="progress-bar"></div></div>
+            </div>
+            <div class="col-reward"><strong>Reward:</strong> Misc Starlancer Tac</div>
+        </div>
+    </div>
+    <div class="section-content">
+        <button class="reset-btn" onclick="resetProgress('misc-starlancer-tac')">Reset Progress</button>
+        <table>
+            <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+            <tbody>
+                <tr><td data-tooltip="Earned from Wikelo contracts/missions">Wikelo Favor</td><td>50</td><td class="collected"><input type="number" min="0" data-id="starlancer-tac-wikelo-favor"></td><td class="complete"><input type="checkbox" data-id="starlancer-tac-wikelo-favor-done"></td></tr>
+                <tr><td data-tooltip="Helmet from Ace series">Ace Interceptor Helmet</td><td>15</td><td class="collected"><input type="number" min="0" data-id="starlancer-tac-ace-helmet"></td><td class="complete"><input type="checkbox" data-id="starlancer-tac-ace-helmet-done"></td></tr>
+                <tr><td data-tooltip="Rewards from investigation missions in the ASD facilities">ASD Secure Drive</td><td>30</td><td class="collected"><input type="number" min="0" data-id="starlancer-tac-asd"></td><td class="complete"><input type="checkbox" data-id="starlancer-tac-asd-done"></td></tr>
+                <tr><td data-tooltip="Rare irradiated item">Irradiated Valakkar Pearl (AAA)</td><td>3</td><td class="collected"><input type="number" min="0" data-id="starlancer-tac-pearl-aaa"></td><td class="complete"><input type="checkbox" data-id="starlancer-tac-pearl-aaa-done"></td></tr>
+                <tr><td data-tooltip="Rare pristine item">Tevarin War Service Marker (Pristine)</td><td>3</td><td class="collected"><input type="number" min="0" data-id="starlancer-tac-tevarin"></td><td class="complete"><input type="checkbox" data-id="starlancer-tac-tevarin-done"></td></tr>
+                <tr><td data-tooltip="Loot from orbital stations">DCHS-05 Orbital Positioning Comp-Board</td><td>3</td><td class="collected"><input type="number" min="0" data-id="starlancer-tac-dchs"></td><td class="complete"><input type="checkbox" data-id="starlancer-tac-dchs-done"></td></tr>
+                <tr><td data-tooltip="Refined from Carinite ore">Carinite (Pure)</td><td>3</td><td class="collected"><input type="number" min="0" data-id="starlancer-tac-carinite-pure"></td><td class="complete"><input type="checkbox" data-id="starlancer-tac-carinite-pure-done"></td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Prowler Utility -->
+<div class="section" id="prowler-utility">
+    <div class="section-header">
+        <div class="header-columns">
+            <div class="col-name">Prowler More Utility</div>
+            <div class="col-progress">
+                <div class="progress-container"><div class="progress-bar"></div></div>
+            </div>
+            <div class="col-reward"><strong>Reward:</strong> Prowler Utility</div>
+        </div>
+    </div>
+    <div class="section-content">
+        <button class="reset-btn" onclick="resetProgress('prowler-utility')">Reset Progress</button>
+        <table>
+            <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+            <tbody>
+                <tr><td data-tooltip="Earned from Wikelo contracts/missions">Wikelo Favor</td><td>40</td><td class="collected"><input type="number" min="0" data-id="prowler-wikelo-favor"></td><td class="complete"><input type="checkbox" data-id="prowler-wikelo-favor-done"></td></tr>
+                <tr><td data-tooltip="Yormandi loot">Yormandi Eye</td><td>20</td><td class="collected"><input type="number" min="0" data-id="prowler-yormandi-eye"></td><td class="complete"><input type="checkbox" data-id="prowler-yormandi-eye-done"></td></tr>
+                <tr><td data-tooltip="Yormandi loot">Yormandi Tongue</td><td>10</td><td class="collected"><input type="number" min="0" data-id="prowler-yormandi-tongue"></td><td class="complete"><input type="checkbox" data-id="prowler-yormandi-tongue-done"></td></tr>
+                <tr><td data-tooltip="Rare irradiated item">Irradiated Valakkar Pearl (AAA)</td><td>3</td><td class="collected"><input type="number" min="0" data-id="prowler-pearl-aaa"></td><td class="complete"><input type="checkbox" data-id="prowler-pearl-aaa-done"></td></tr>
+                <tr><td data-tooltip="Refined from Carinite ore">Carinite (Pure)</td><td>3</td><td class="collected"><input type="number" min="0" data-id="prowler-carinite-pure"></td><td class="complete"><input type="checkbox" data-id="prowler-carinite-pure-done"></td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- RSI Meteor Mod -->
+<div class="section" id="rsi-meteor-mod">
+    <div class="section-header">
+        <div class="header-columns">
+            <div class="col-name">RSI Meteor Mod</div>
+            <div class="col-progress">
+                <div class="progress-container"><div class="progress-bar"></div></div>
+            </div>
+            <div class="col-reward"><strong>Reward:</strong> RSI Meteor</div>
+        </div>
+    </div>
+    <div class="section-content">
+        <button class="reset-btn" onclick="resetProgress('rsi-meteor-mod')">Reset Progress</button>
+        <table>
+            <thead><tr><th>Ingredient</th><th>Needed</th><th>Collected</th><th>Done?</th></tr></thead>
+            <tbody>
+                <tr><td data-tooltip="Earned from Wikelo contracts/missions">Wikelo Favor</td><td>10</td><td class="collected"><input type="number" min="0" data-id="meteor-wikelo-favor"></td><td class="complete"><input type="checkbox" data-id="meteor-wikelo-favor-done"></td></tr>
+                <tr><td data-tooltip="Helmet from Ace series">Ace Interceptor Helmet</td><td>5</td><td class="collected"><input type="number" min="0" data-id="meteor-ace-helmet"></td><td class="complete"><input type="checkbox" data-id="meteor-ace-helmet-done"></td></tr>
+                <tr><td data-tooltip="Rare pristine item">Large Artefact Fragment (Pristine)</td><td>1</td><td class="collected"><input type="number" min="0" data-id="meteor-artefact"></td><td class="complete"><input type="checkbox" data-id="meteor-artefact-done"></td></tr>
+                <tr><td data-tooltip="Vanduul loot">Vanduul Plating</td><td>10</td><td class="collected"><input type="number" min="0" data-id="meteor-vanduul-plating"></td><td class="complete"><input type="checkbox" data-id="meteor-vanduul-plating-done"></td></tr>
+                <tr><td data-tooltip="Vanduul loot">Vanduul Metal</td><td>10</td><td class="collected"><input type="number" min="0" data-id="meteor-vanduul-plating"></td><td class="complete"><input type="checkbox" data-id="meteor-vanduul-plating-done"></td></tr>            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<div class="footer">
+    <div style="text-align:center; margin:40px 0 20px; padding:14px; background:rgba(0,0,0,0.55); border-radius:10px;">
+        <h3 style="color:#ffcc00; margin:0; font-family:'Orbitron', sans-serif; font-weight:700; letter-spacing:1px;">
+            🌟 Happy Hunting! Fly safe and may your Wikelo loot be plentiful! 🌟
+        </h3>
+    </div>
+    <div style="color:#000000; font-style:italic; font-weight:bold; font-size:1.2em; text-align:center; margin-top:15px; line-height:1.5; font-family:'Orbitron', sans-serif;">
+        Built by Bobby_Bull for the Star Citizen Community. If you found this helpful, please consider buying me a coffee! ☕ o7<br>
+        Cash App: $BobbyBull2<br>
+        Venmo: @BobbyBull2
+    </div>
+</div>
+    <script>
+        const STORAGE_KEY = 'wikeloChecklistData';
+
+        function loadData() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                const data = JSON.parse(saved);
+                document.querySelectorAll('input[type="number"], input[type="checkbox"]').forEach(el => {
+                    const id = el.dataset.id;
+                    if (id in data) {
+                        if (el.type === 'checkbox') el.checked = data[id];
+                        else el.value = data[id];
+                    }
+                });
+            }
+            updateAll();
+        }
+
+        function saveData() {
+            const data = {};
+            document.querySelectorAll('input[type="number"], input[type="checkbox"]').forEach(el => {
+                const id = el.dataset.id;
+                if (id) data[id] = el.type === 'checkbox' ? el.checked : Number(el.value) || 0;
+            });
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            updateAll();
+        }
+
+        function updateAll() {
+            let completed = 0;
+            let totalProgress = 0;
+            const sections = document.querySelectorAll('.section');
+
+            sections.forEach(section => {
+                const checkboxes = section.querySelectorAll('input[type="checkbox"]');
+                const checked = Array.from(checkboxes).filter(cb => cb.checked).length;
+                const total = checkboxes.length;
+                const percent = total > 0 ? (checked / total) * 100 : 0;
+
+                const bar = section.querySelector('.progress-bar');
+                bar.style.width = percent + '%';
+
+                const container = section.querySelector('.progress-container');
+                if (percent >= 100) {
+                    container.classList.add('progress-complete');
+                    section.classList.add('complete');
+                    section.removeAttribute('open');
+                    completed++;
+                } else {
+                    container.classList.remove('progress-complete');
+                    section.classList.remove('complete');
+                }
+
+                totalProgress += percent;
+            });
+
+            const globalPercent = sections.length > 0 ? (totalProgress / sections.length) : 0;
+            document.getElementById('global-bar').style.width = globalPercent + '%';
+            document.getElementById('stats-text').textContent = `${completed}/${sections.length} Contracts Complete • Global Progress: ${Math.round(globalPercent)}%`;
+        }
+
+        function resetProgress(sectionId) {
+            if (confirm(`Reset progress for this contract?`)) {
+                document.querySelectorAll(`#${sectionId} input[type="number"]`).forEach(input => input.value = 0);
+                document.querySelectorAll(`#${sectionId} input[type="checkbox"]`).forEach(cb => cb.checked = false);
+                saveData();
+            }
+        }
+
+        function resetAll() {
+            if (confirm('Reset ALL progress? This will clear everything.')) {
+                localStorage.removeItem(STORAGE_KEY);
+                document.querySelectorAll('input[type="number"]').forEach(input => input.value = 0);
+                document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+                updateAll();
+            }
+        }
+
+        function shareProgress() {
+            let text = "My Wikelo Contract Progress:\n\n";
+            document.querySelectorAll('.section').forEach(section => {
+                const name = section.querySelector('.col-name').textContent.trim();
+                const reward = section.querySelector('.col-reward').textContent.trim();
+                const checkboxes = section.querySelectorAll('input[type="checkbox"]');
+                const completed = Array.from(checkboxes).filter(cb => cb.checked).length;
+                const total = checkboxes.length;
+                text += `${name} (${reward}) - ${completed}/${total} complete (${Math.round((completed/total)*100)}%)\n`;
+            });
+            text += `\nTrack yours: https://your-github-pages-link-here`;
+
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Progress copied to clipboard! Paste it anywhere.");
+            }).catch(() => {
+                alert("Copy failed — please manually select and copy the text.");
+            });
+        }
+
+        function filterContracts() {
+            const filter = document.getElementById('search').value.toLowerCase();
+            document.querySelectorAll('.section').forEach(section => {
+                const name = section.querySelector('.col-name').textContent.toLowerCase();
+                const reward = section.querySelector('.col-reward').textContent.toLowerCase();
+                section.style.display = (name.includes(filter) || reward.includes(filter)) ? 'block' : 'none';
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.section-header').forEach(header => {
+                header.addEventListener('click', () => {
+                    const section = header.parentElement;
+                    section.toggleAttribute('open');
+                });
+            });
+
+            document.querySelectorAll('input').forEach(input => {
+                input.addEventListener('change', saveData);
+                input.addEventListener('input', saveData);
+            });
+
+            loadData();
+        });
+    </script>
+</body>
+</html>
