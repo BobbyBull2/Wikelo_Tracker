@@ -1525,14 +1525,31 @@ td[data-tooltip]:hover::after {
             });
         }
 
-        function filterContracts() {
-            const filter = document.getElementById('search').value.toLowerCase();
-            document.querySelectorAll('.section').forEach(section => {
-                const name = section.querySelector('.col-name').textContent.toLowerCase();
-                const reward = section.querySelector('.col-reward').textContent.toLowerCase();
-                section.style.display = (name.includes(filter) || reward.includes(filter)) ? 'block' : 'none';
-            });
-        }
+     function filterContracts() {
+    const filter = document.getElementById('search').value.toLowerCase().trim();
+
+    document.querySelectorAll('.section').forEach(section => {
+        // Get contract name and reward
+        const name = section.querySelector('.col-name')?.textContent.toLowerCase() || '';
+        const reward = section.querySelector('.col-reward')?.textContent.toLowerCase() || '';
+
+        // Get all ingredient names from the table rows
+        let hasIngredientMatch = false;
+        section.querySelectorAll('tbody td:first-child').forEach(td => {
+            const ingredientText = td.textContent.toLowerCase();
+            if (ingredientText.includes(filter)) {
+                hasIngredientMatch = true;
+            }
+        });
+
+        // Show section if ANY of these match: name, reward, or any ingredient
+        const shouldShow = name.includes(filter) ||
+                           reward.includes(filter) ||
+                           hasIngredientMatch;
+
+        section.style.display = shouldShow ? 'block' : 'none';
+    });
+}
 
         function joinOrg() {
             const code = document.getElementById('org-code').value.trim();
@@ -1591,4 +1608,3 @@ td[data-tooltip]:hover::after {
 </body>
 </html>
  
-
