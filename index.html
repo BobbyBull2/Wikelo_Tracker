@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <meta name="theme-color" content="#0f0f23">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">    <meta name="theme-color" content="#0f0f23">
     <meta name="description" content="Track your Wikelo contract progress in Star Citizen">
     <title>🪐 Bobby's Wikelo Tracker v4.6 🛸</title>
 
@@ -13,121 +12,198 @@
 
     <style>
         * { box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: radial-gradient(circle at 20% 80%, rgba(120,119,198,0.25) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 20%, rgba(255,119,198,0.25) 0%, transparent 50%),
-                        radial-gradient(circle at 40% 40%, rgba(120,219,255,0.25) 0%, transparent 50%),
-                        linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 25%, #16213e 50%, #0f0f23 100%);
-            background-attachment: fixed;
-            color: #f0f0f0;
-            margin: 0;
-            padding: 15px;
-            min-height: 100vh;
-            line-height: 1.3;
-        }
-        .stars {
-            position: fixed; inset: 0; pointer-events: none; z-index: -1;
-            background: radial-gradient(1px 1px at 20px 30px, #eee),
-                        radial-gradient(1px 1px at 40px 70px, rgba(255,255,255,0.7)),
-                        radial-gradient(2px 2px at 90px 40px, #fff);
-            background-size: 300px 200px;
-            animation: twinkle 25s ease-in-out infinite alternate;
-        }
-        @keyframes twinkle { 0%,100% {opacity:0.9;} 50% {opacity:0.4;} }
-        h1 {
-            text-align: center;
-            color: #00ff99;
-            text-shadow: 0 0 12px #00ff99;
-            margin: 10px 0 6px;
-            font-size: 2em;
-        }
-        .subtitle {
-            text-align: center;
-            color: #99ff44;
-            margin: 0 0 20px;
-            font-size: 1.05em;
-            font-style: italic;
-        }
-        .controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            justify-content: center;
-            margin: 0 0 20px;
-        }
-        .print-btn, .reset-all-btn, .share-btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 20px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 3px 12px rgba(0,255,153,0.4);
-        }
-        .print-btn { background: linear-gradient(45deg, #00ff99, #0099ff); color: #000; }
-        .reset-all-btn { background: linear-gradient(45deg, #ff6666, #cc3333); color: white; }
-        .share-btn { background: linear-gradient(45deg, #ffaa00, #ff6600); color: white; }
-        .stats { text-align: center; margin: 0 0 20px; font-size: 1.1em; }
-        .global-progress { width: 80%; max-width: 600px; height: 20px; background: rgba(0,0,0,0.6); border-radius: 10px; overflow: hidden; margin: 10px auto; }
-        .global-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #00ff99, #66ffbb); transition: width 1s ease; }
-        .search-box { width: 100%; max-width: 500px; padding: 10px; margin: 0 auto 20px; display: block; font-size: 1em; border-radius: 8px; border: 1px solid #44ffaa; background: rgba(0,0,0,0.5); color: white; }
-        .section { margin: 20px 0 16px; border-radius: 8px; overflow: hidden; background: rgba(8,12,25,0.94); box-shadow: 0 4px 16px rgba(0,0,0,0.5); }
-        .section-header { background: linear-gradient(90deg, rgba(0,255,153,0.35), rgba(0,153,255,0.35)); padding: 14px 16px; cursor: pointer; user-select: none; display: flex; justify-content: space-between; align-items: center; font-size: 1.22em; color: #ffcc00; text-shadow: 0 0 5px #ff9900; }
-        .section-header:hover { background: linear-gradient(90deg, rgba(0,255,153,0.5), rgba(0,153,255,0.5)); }
-        .section-header::after { content: '▼'; font-size: 1em; transition: transform 0.3s; }
-        .section[open] .section-header::after { transform: rotate(180deg); }
-        .header-columns { flex: 1; display: flex; align-items: center; gap: 20px; }
-        .col-name { flex: 0 0 260px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .col-progress { flex: 0 0 960px; }
-        .col-reward { flex: 1 1 auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #88ffdd; font-size: 0.94em; }
-        .progress-container { background: rgba(0,0,0,0.7); border-radius: 8px; height: 20px; overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.6); }
-        .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #00ff99, #66ffbb); transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); background-size: 200% 100%; animation: shine 3s linear infinite; }
-        @keyframes shine { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-        .progress-complete .progress-bar { background: linear-gradient(90deg, #88ff88, #ccffcc); animation: shine-complete 2s linear infinite; }
-        @keyframes shine-complete { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-        .section-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease, padding 0.3s ease; padding: 0 16px; position: relative; }
-        .section[open] .section-content { max-height: 2000px; padding: 14px 16px; }
-        .reset-btn { position: absolute; top: 10px; right: 16px; padding: 6px 12px; background: linear-gradient(45deg, #ff6666, #cc3333); color: #fff; border: none; border-radius: 6px; font-size: 0.85em; cursor: pointer; box-shadow: 0 2px 8px rgba(255,102,102,0.3); }
-        .reset-btn:hover { background: linear-gradient(45deg, #cc3333, #ff6666); }
-        td[data-tooltip] { position: relative; cursor: help; }
-        td[data-tooltip]:hover::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.9);
-            color: white;
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 0.85em;
-            white-space: nowrap;
-            z-index: 10;
-            pointer-events: none;
-        }
-        .footer { text-align: center; font-size: 0.85em; color: #99ff44; margin: 20px 0; }
-        #org-section { text-align: center; margin: 15px 0; font-size: 0.95em; color: #99ff44; }
-        #org-code { padding: 10px; width: 250px; font-size: 1em; border-radius: 6px; border: 1px solid #44ffaa; background: rgba(0,0,0,0.5); color: white; }
-        @media (max-width: 768px) {
-            .header-columns { flex-direction: column; align-items: flex-start; gap: 8px; }
-            .col-progress { width: 100%; flex: 0 0 auto; }
-            .col-reward { width: 100%; }
-            .controls { flex-direction: column; }
-            .global-progress { width: 100%; }
-        }
-        @media print {
-            body { background: white !important; color: #000 !important; padding: 10px !important; }
-            .stars, .controls, .stats, .search-box, .footer, #org-section { display: none !important; }
-            h1, .subtitle { text-align: left !important; }
-            .section-header { background: #e8f4ff !important; color: #000 !important; text-shadow: none; }
-            .progress-container { display: none !important; }
-            .section-content { max-height: none !important; padding: 10px 12px !important; }
-            table { background: white !important; }
-            th { background: #f0f8ff !important; color: #000 !important; }
-            td { border-bottom: 1px solid #ccc !important; color: #000 !important; }
-            .collected input { border: 1px dashed #777 !important; background: #f8f8f8 !important; color: #000 !important; }
-            @page { size: A4 landscape; margin: 10mm; }
-        }
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: radial-gradient(circle at 20% 80%, rgba(139,0,0,0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(139,0,0,0.08) 0%, transparent 50%),
+                linear-gradient(135deg, #0d0d14 0%, #111118 25%, #1a1a22 50%, #0d0d14 100%);
+    background-attachment: fixed;
+    color: #d0d0d0;
+    margin: 0;
+    padding: 15px;
+    min-height: 100vh;
+    line-height: 1.3;
+}
+
+.stars {
+    position: fixed; inset: 0; pointer-events: none; z-index: -1;
+    background: radial-gradient(1px 1px at 20px 30px, #aaa),
+                radial-gradient(1px 1px at 40px 70px, rgba(200,200,200,0.4)),
+                radial-gradient(2px 2px at 90px 40px, #ccc);
+    background-size: 300px 200px;
+    opacity: 0.6; /* toned down for maturity */
+    animation: twinkle 40s ease-in-out infinite alternate;
+}
+
+@keyframes twinkle { 0%,100% {opacity:0.6;} 50% {opacity:0.3;} }
+
+h1 {
+    text-align: center;
+    color: #f8f8f8;
+    text-shadow: 0 0 10px #8b0000;
+    margin: 10px 0 6px;
+    font-size: 2em;
+}
+
+.subtitle {
+    text-align: center;
+    color: #a0a0a0;
+    margin: 0 0 20px;
+    font-size: 1.05em;
+    font-style: italic;
+}
+
+.controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    margin: 0 0 20px;
+}
+
+.print-btn, .reset-all-btn, .share-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    box-shadow: 0 3px 12px rgba(139,0,0,0.3);
+}
+
+.print-btn { background: linear-gradient(45deg, #8b0000, #c8102e); }
+.reset-all-btn { background: linear-gradient(45deg, #4a4a4a, #333); }
+.share-btn { background: linear-gradient(45deg, #555, #777); }
+
+.stats { text-align: center; margin: 0 0 20px; font-size: 1.1em; color: #a0a0a0; }
+.global-progress { width: 80%; max-width: 600px; height: 20px; background: #222; border-radius: 10px; overflow: hidden; margin: 10px auto; box-shadow: inset 0 1px 3px #000; }
+.global-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #8b0000, #c8102e); transition: width 1s ease; }
+
+.search-box {
+    width: 100%; max-width: 500px; padding: 10px; margin: 0 auto 20px; display: block;
+    font-size: 1em; border-radius: 8px; border: 1px solid #555;
+    background: #1a1a22; color: #d0d0d0;
+}
+
+.section {
+    margin: 20px 0 16px; border-radius: 8px; overflow: hidden;
+    background: #16161e; box-shadow: 0 4px 16px rgba(0,0,0,0.7);
+}
+
+.section-header {
+    background: linear-gradient(90deg, rgba(139,0,0,0.25), rgba(200,16,46,0.15));
+    padding: 14px 16px; cursor: pointer; user-select: none;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 1.22em; color: #f0f0f0; text-shadow: 0 0 4px #8b0000;
+}
+
+.section-header:hover { background: linear-gradient(90deg, rgba(139,0,0,0.4), rgba(200,16,46,0.3)); }
+
+.section-header::after { content: '▼'; font-size: 1em; transition: transform 0.3s; }
+.section[open] .section-header::after { transform: rotate(180deg); }
+
+.header-columns { flex: 1; display: flex; align-items: center; gap: 20px; }
+.col-name { flex: 0 0 260px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #f0f0f0; }
+.col-progress {
+    flex: 1 1 auto;          /* grows/shrinks to fill available space */
+    min-width: 200px;        /* prevents it from collapsing too much */
+    max-width: 960px;        /* keeps max size on wide screens */
+}
+.col-reward { flex: 1 1 auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #c0c0c0; font-size: 0.94em; }
+
+.progress-container { background: #222; border-radius: 8px; height: 20px; overflow: hidden; box-shadow: inset 0 1px 3px #000; }
+.progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #8b0000, #c8102e); transition: width 0.8s cubic-bezier(0.4,0,0.2,1); }
+.progress-complete .progress-bar { background: linear-gradient(90deg, #4a704a, #6a906a); }
+
+.section-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease, padding 0.3s ease; padding: 0 16px; position: relative; }
+.section[open] .section-content { max-height: 2000px; padding: 14px 16px; }
+
+.reset-btn {
+    position: absolute; top: 10px; right: 16px; padding: 6px 12px;
+    background: linear-gradient(45deg, #4a4a4a, #333); color: #d0d0d0;
+    border: none; border-radius: 6px; font-size: 0.85em; cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+.reset-btn:hover { background: linear-gradient(45deg, #333, #555); }
+
+td[data-tooltip] { position: relative; cursor: help; }
+td[data-tooltip]:hover::after {
+    content: attr(data-tooltip);
+    position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+    background: #1a1a1a; color: #d0d0d0; padding: 6px 10px; border-radius: 6px;
+    font-size: 0.85em; white-space: nowrap; z-index: 10; pointer-events: none;
+    box-shadow: 0 2px 8px #000;
+}
+
+.footer { text-align: center; font-size: 0.85em; color: #a0a0a0; margin: 20px 0; }
+
+/* Mobile / narrow screens (including vertical monitors) */
+@media (max-width: 1000px) {
+    .header-columns {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    .col-name,
+    .col-progress,
+    .col-reward {
+        width: 100%;
+        flex: 0 0 auto;
+    }
+    .col-progress {
+        min-width: 100%;
+        max-width: none;
+    }
+    .global-progress {
+        width: 100%;
+    }
+    .controls {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+/* Very small screens (phones) */
+@media (max-width: 480px) {
+    h1 { font-size: 1.6em; }
+    .section-header { font-size: 1.1em; padding: 12px; }
+    .search-box { font-size: 0.9em; }
+}
+}
+
+@media print {
+    body { background: white !important; color: #000 !important; padding: 10px !important; }
+    .stars, .controls, .stats, .search-box, .footer, #org-section { display: none !important; }
+    h1, .subtitle { text-align: left !important; color: #000 !important; text-shadow: none; }
+    .section-header { background: #f0f0f0 !important; color: #000 !important; text-shadow: none; }
+    .progress-container { display: none !important; }
+    .section-content { max-height: none !important; padding: 10px 12px !important; }
+    table { background: white !important; }
+    th { background: #e8e8e8 !important; color: #000 !important; }
+    td { border-bottom: 1px solid #ccc !important; color: #000 !important; }
+    .collected input { border: 1px dashed #777 !important; background: #f8f8f8 !important; color: #000 !important; }
+    @page { size: A4 landscape; margin: 10mm; }
+}
+@media (max-width: 900px) {  /* or try 1000px / 1100px if needed */
+    .header-columns {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    .col-name,
+    .col-progress,
+    .col-reward {
+        width: 100%;
+        flex: 0 0 auto;
+    }
+    .col-progress {
+        min-width: 100%;
+    }
+    .global-progress {
+        width: 100%;
+    }
+}
     </style>
 </head></head>
 <body>
@@ -154,7 +230,7 @@
     <!-- Org sharing UI -->
     <div id="org-section">
         <p><strong>Org Sharing (optional):</strong> Enter or create a shared code below. First person to save with a code "creates" it — others join with the same code to sync progress in real-time.</p>
-        <input type="text" id="org-code" placeholder="e.g. Unique_Name" />
+        <input type="text" id="org-code" placeholder="e.g. BobbyBullAlpha" />
         <button onclick="joinOrg()">Join / Create Org</button>
     </div>
 
@@ -1514,4 +1590,3 @@
 </body>
 </html>
  
-
