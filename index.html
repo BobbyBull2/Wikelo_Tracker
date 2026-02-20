@@ -106,9 +106,10 @@ h1 {
 .header-columns { flex: 1; display: flex; align-items: center; gap: 20px; }
 .col-name { flex: 0 0 260px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #f0f0f0; }
 .col-progress {
-    flex: 1 1 auto;          /* grows/shrinks to fill available space */
-    min-width: 200px;        /* prevents it from collapsing too much */
-    max-width: 960px;        /* keeps max size on wide screens */
+    flex: 1 1 300px;          /* grows to fill space, but starts at min 300px */
+    min-width: 300px;         /* prevents collapse on narrow */
+    max-width: 960px;         /* caps on wide screens */
+}
 }
 .col-reward { flex: 1 1 auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #c0c0c0; font-size: 0.94em; }
 
@@ -185,7 +186,7 @@ td[data-tooltip]:hover::after {
     .collected input { border: 1px dashed #777 !important; background: #f8f8f8 !important; color: #000 !important; }
     @page { size: A4 landscape; margin: 10mm; }
 }
-@media (max-width: 900px) {  /* or try 1000px / 1100px if needed */
+@media (max-width: 1000px) {  /* or try 1000px / 1100px if needed */
     .header-columns {
         flex-direction: column;
         align-items: flex-start;
