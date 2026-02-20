@@ -2,11 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-	<meta name="theme-color" content="#0f0f23">
-	<meta name="description" content="Track your Wikelo contract progress in Star Citizen">
-<title>🪐 Bobby's Wikelo Tracker v4.6 🛸</title>
+    <meta name="theme-color" content="#0f0f23">
+    <meta name="description" content="Track your Wikelo contract progress in Star Citizen">
+    <title>🪐 Bobby's Wikelo Tracker v4.6 🛸</title>
+
+    <!-- Firebase SDKs (required for org sharing) -->
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+
     <style>
         * { box-sizing: border-box; }
         body {
@@ -85,104 +89,52 @@
         .section[open] .section-content { max-height: 2000px; padding: 14px 16px; }
         .reset-btn { position: absolute; top: 10px; right: 16px; padding: 6px 12px; background: linear-gradient(45deg, #ff6666, #cc3333); color: #fff; border: none; border-radius: 6px; font-size: 0.85em; cursor: pointer; box-shadow: 0 2px 8px rgba(255,102,102,0.3); }
         .reset-btn:hover { background: linear-gradient(45deg, #cc3333, #ff6666); }
-        td[data-tooltip] { position: relative; }
-        td[data-tooltip]:hover::after { content: attr(data-tooltip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.9); color: white; padding: 6px 10px; border-radius: 6px; font-size: 0.85em; white-space: nowrap; z-index: 10; pointer-events: none; }
+        td[data-tooltip] { position: relative; cursor: help; }
+        td[data-tooltip]:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            white-space: nowrap;
+            z-index: 10;
+            pointer-events: none;
+        }
         .footer { text-align: center; font-size: 0.85em; color: #99ff44; margin: 20px 0; }
-        @media (max-width: 768px) { .header-columns { flex-direction: column; align-items: flex-start; gap: 8px; } .col-progress { width: 100%; flex: 0 0 auto; } .col-reward { width: 100%; } .controls { flex-direction: column; } .global-progress { width: 100%; } }
-        @media print { body { background: white !important; color: #000 !important; padding: 10px !important; } .stars, .print-btn, .reset-btn, .controls, .stats, .search-box, .footer { display: none !important; } h1, .subtitle { text-align: left !important; } .section-header { background: #e8f4ff !important; color: #000 !important; text-shadow: none; } .progress-container { display: none !important; } .section-content { max-height: none !important; padding: 10px 12px !important; } table { background: white !important; } th { background: #f0f8ff !important; color: #000 !important; } td { border-bottom: 1px solid #ccc !important; color: #000 !important; } .collected input { border: 1px dashed #777 !important; background: #f8f8f8 !important; color: #000 !important; } @page { size: A4 landscape; margin: 10mm; } }
-   
-/* Core responsive rules (apply always) */
-.header-columns {
-    flex-wrap: wrap;
-    gap: 12px;
-}
-
-.col-name {
-    flex: 1 1 220px;          /* grow but keep reasonable min */
-    min-width: 200px;
-    max-width: 35%;           /* cap so progress gets room */
-}
-
-.col-progress {
-    flex: 3 1 400px;          /* progress takes most space */
-    min-width: 300px;
-}
-
-.col-reward {
-    flex: 1 1 250px;
-    min-width: 220px;
-}
-
-/* Table horizontal scroll instead of overflow/cutoff */
-.section-content table {
-    width: 100%;
-    min-width: 600px;         /* force scroll if narrower than this */
-    overflow-x: auto;
-    display: block;
-}
-
-/* Only force stacking on very narrow screens (phones, tiny windows) */
-@media (max-width: 720px) {
-    .header-columns {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 8px;
-    }
-
-    .col-name,
-    .col-progress,
-    .col-reward {
-        flex: none;
-        width: 100%;
-        max-width: none;
-        min-width: 0;
-    }
-
-    .col-name {
-        order: 1;
-        font-size: 1.15em;
-        text-align: center;
-    }
-
-    .col-progress {
-        order: 2;
-    }
-
-    .col-reward {
-        order: 3;
-        font-size: 0.95em;
-        text-align: center;
-        margin-top: 5px;
-    }
-
-    /* Make reset button full-width friendly */
-    .reset-btn {
-        position: static;
-        margin: 12px auto;
-        display: block;
-        width: fit-content;
-        padding: 8px 16px;
-    }
-
-    input[type="number"] {
-        width: 100px;
-    }
-}
-
-/* Always full-width for global elements */
-.global-progress,
-.search-box {
-    width: 100% !important;
-    max-width: none !important;
-}
-
- </style>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
-</head>
+        #org-section { text-align: center; margin: 15px 0; font-size: 0.95em; color: #99ff44; }
+        #org-code { padding: 10px; width: 250px; font-size: 1em; border-radius: 6px; border: 1px solid #44ffaa; background: rgba(0,0,0,0.5); color: white; }
+        @media (max-width: 768px) {
+            .header-columns { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .col-progress { width: 100%; flex: 0 0 auto; }
+            .col-reward { width: 100%; }
+            .controls { flex-direction: column; }
+            .global-progress { width: 100%; }
+        }
+        @media print {
+            body { background: white !important; color: #000 !important; padding: 10px !important; }
+            .stars, .controls, .stats, .search-box, .footer, #org-section { display: none !important; }
+            h1, .subtitle { text-align: left !important; }
+            .section-header { background: #e8f4ff !important; color: #000 !important; text-shadow: none; }
+            .progress-container { display: none !important; }
+            .section-content { max-height: none !important; padding: 10px 12px !important; }
+            table { background: white !important; }
+            th { background: #f0f8ff !important; color: #000 !important; }
+            td { border-bottom: 1px solid #ccc !important; color: #000 !important; }
+            .collected input { border: 1px dashed #777 !important; background: #f8f8f8 !important; color: #000 !important; }
+            @page { size: A4 landscape; margin: 10mm; }
+        }
+    </style>
+</head></head>
 <body>
+    <body>
     <div class="stars"></div>
     <h1>🪐 Bobby's Wikelo Tracker v4.6 🛸</h1>
-    <p class="subtitle">Hunt → Claim Rewards – Progress saved automatically</p>
+    <p class="subtitle">Hunt → Claim Rewards – Progress saved automatically (local + shared via org code)</p>
 
     <div class="controls">
         <button class="print-btn" onclick="window.print()">🖨️ Print (Landscape)</button>
@@ -191,13 +143,22 @@
     </div>
 
     <div class="stats">
-        <div id="stats-text">0/54 Contracts Complete • Global Progress: 0%</div>
+        <div id="stats-text">0/50 Contracts Complete • Global Progress: 0%</div>
         <div class="global-progress">
             <div class="global-bar" id="global-bar"></div>
         </div>
     </div>
 
     <input type="text" class="search-box" id="search" placeholder="Search contracts or rewards..." oninput="filterContracts()">
+
+    <!-- Org sharing UI -->
+    <div id="org-section">
+        <p><strong>Org Sharing (optional):</strong> Enter or create a shared code below. First person to save with a code "creates" it — others join with the same code to sync progress in real-time.</p>
+        <input type="text" id="org-code" placeholder="e.g. BobbyBullAlpha" />
+        <button onclick="joinOrg()">Join / Create Org</button>
+    </div>
+
+    <!-- Sections go here next -->
 
     <!-- 54 Contracts - Alphabetical Order -->
 
@@ -1370,7 +1331,20 @@
         Venmo: @BobbyBull2
     </div>
 </div>
-    <script>
+        <script>
+        // Firebase initialization
+        const firebaseConfig = {
+            apiKey: "AIzaSyDV2A-4pO7A0F33Nw-0NxNtdsGI_aWJQ2M",
+            authDomain: "bobby-s-wikelo-tracker.firebaseapp.com",
+            projectId: "bobby-s-wikelo-tracker",
+            storageBucket: "bobby-s-wikelo-tracker.firebasestorage.app",
+            messagingSenderId: "682269390445",
+            appId: "1:682269390445:web:a0ec1ecdbcffc4d647b164",
+            measurementId: "G-5RL0W69VYM"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
         const STORAGE_KEY = 'wikeloChecklistData';
 
         function loadData() {
@@ -1395,6 +1369,13 @@
                 if (id) data[id] = el.type === 'checkbox' ? el.checked : Number(el.value) || 0;
             });
             localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+
+            // Save to shared Firebase if org code set
+            const orgCode = localStorage.getItem('orgCode');
+            if (orgCode) {
+                db.ref('orgs/' + orgCode).set(data);
+            }
+
             updateAll();
         }
 
@@ -1415,12 +1396,8 @@
                 const container = section.querySelector('.progress-container');
                 if (percent >= 100) {
                     container.classList.add('progress-complete');
-                    section.classList.add('complete');
-                    section.removeAttribute('open');
-                    completed++;
                 } else {
                     container.classList.remove('progress-complete');
-                    section.classList.remove('complete');
                 }
 
                 totalProgress += percent;
@@ -1442,6 +1419,10 @@
         function resetAll() {
             if (confirm('Reset ALL progress? This will clear everything.')) {
                 localStorage.removeItem(STORAGE_KEY);
+                const orgCode = localStorage.getItem('orgCode');
+                if (orgCode) {
+                    db.ref('orgs/' + orgCode).remove(); // Clear shared data
+                }
                 document.querySelectorAll('input[type="number"]').forEach(input => input.value = 0);
                 document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
                 updateAll();
@@ -1458,7 +1439,7 @@
                 const total = checkboxes.length;
                 text += `${name} (${reward}) - ${completed}/${total} complete (${Math.round((completed/total)*100)}%)\n`;
             });
-            text += `\nTrack yours: https://your-github-pages-link-here`;
+            text += `\nTrack yours: https://bobbybull2.github.io/Wikelo_Tracker/`;
 
             navigator.clipboard.writeText(text).then(() => {
                 alert("Progress copied to clipboard! Paste it anywhere.");
@@ -1476,7 +1457,36 @@
             });
         }
 
+        function joinOrg() {
+            const code = document.getElementById('org-code').value.trim();
+            if (!code) {
+                alert("Please enter an org code!");
+                return;
+            }
+            localStorage.setItem('orgCode', code);
+            alert("Joined org: " + code + "\nYour progress is now shared with anyone using this code!");
+            loadSharedProgress(code);
+        }
+
+        function loadSharedProgress(code) {
+            db.ref('orgs/' + code).on('value', snapshot => {
+                const sharedData = snapshot.val();
+                if (sharedData) {
+                    Object.keys(sharedData).forEach(id => {
+                        const el = document.querySelector(`[data-id="${id}"]`);
+                        if (el) {
+                            if (el.type === 'checkbox') el.checked = sharedData[id];
+                            else if (el.type === 'number') el.value = sharedData[id];
+                        }
+                    });
+                    updateAll();
+                }
+            });
+        }
+
+        // Single DOMContentLoaded listener
         document.addEventListener('DOMContentLoaded', () => {
+            // Expand/collapse headers
             document.querySelectorAll('.section-header').forEach(header => {
                 header.addEventListener('click', () => {
                     const section = header.parentElement;
@@ -1484,15 +1494,23 @@
                 });
             });
 
+            // Save on any input change
             document.querySelectorAll('input').forEach(input => {
                 input.addEventListener('change', saveData);
                 input.addEventListener('input', saveData);
             });
 
+            // Load local data
             loadData();
+
+            // Load shared org data if code exists
+            const savedCode = localStorage.getItem('orgCode');
+            if (savedCode) {
+                document.getElementById('org-code').value = savedCode; // Show the code
+                loadSharedProgress(savedCode);
+            }
         });
     </script>
 </body>
-
 </html>
-
+ 
