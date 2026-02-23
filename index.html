@@ -249,11 +249,11 @@ td[data-tooltip]:hover::after {
         <input type="text" id="org-code" placeholder="e.g. Unique Name" />
         <button onclick="joinOrg()">Join / Create Org</button>
     </div>
-<!-- My Inventory Section (fixed: restored table body, added reset button, centered/expanded text, no progress bar) -->
+<!-- My Inventory Section -->
 <div class="section" id="inventory-section" style="background:#0a0a12; border:1px solid #222; margin:20px 0;">
     <div class="section-header" style="background:linear-gradient(90deg, #111118, #1a1a22); border-bottom:1px solid #333; padding:16px 20px;">
         <div style="text-align:center; width:100%;">
-            <div style="font-size:1.3em; font-weight:bold; color:#e0e0e0; margin-bottom:4px;">
+            <div style="font-size:1.3em; font-weight:bold; color:#e0e0e0; margin-bottom:0px;">
                 My Inventory - Materials Stock
             </div>
             <div style="font-size:0.95em; color:#b0b0b0;">
@@ -261,7 +261,7 @@ td[data-tooltip]:hover::after {
             </div>
         </div>
     </div>
-    <div class="section-content" style="padding:20px;">
+    <div class="section-content" style="padding:0px;">
         <p style="text-align:center; color:#a0a0a0; margin:0 0 16px; font-size:0.95em;">
             Enter your current stock of each material (from cargo/inventory).  
     Colored dots on rewards update instantly:
@@ -288,7 +288,104 @@ td[data-tooltip]:hover::after {
             </tbody>
         </table>
     </div>
-</div>    <!-- Sections go here next -->
+</div>   
+
+<!-- Tips & Gathering Sources (side-by-side centered header, matched to My Inventory style) -->
+<div class="section" id="tips-sources" style="background:#0a0a12; border:1px solid #222; margin:20px 0;">
+    <div class="section-header" style="background:linear-gradient(90deg, #111118, #1a1a22); border-bottom:1px solid #333; padding:16px 20px; text-align:center;">
+        <div style="display:flex; justify-content:center; align-items:center; gap:200px; flex-wrap:wrap; max-width:900px; margin:0 auto;">
+            <div style="font-size:1.3em; font-weight:bold; color:#e0e0e0;">
+                Tips & Gathering Sources
+            </div>
+            <div style="font-size:0.95em; color:#e0e0e0;">
+                Best locations & methods for farming materials
+            </div>
+        </div>
+    </div>
+ <div class="section-content" style="padding:0px 0px; text-align:left;">
+    <ul style="list-style:none; padding:0; margin:0 auto; max-width:1100px; font-size:1.1em; line-height:1.6; text-align:left; display:inline-block;">
+        <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
+            <strong>ASD Secure Drive</strong><br>
+            Farm via investigation contracts at ASD Onyx Facilities (Hurston & microTech bunkers). Fastest method: engineering wing speedruns (1–2 drives in 5–10 min). Also common in Jumptown events and 890 Jump wrecks.
+        </li>
+        <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
+            <strong>Carinite / Carinite (Pure)</strong><br>
+            Mine raw Carinite on Aberdeen, Lyria, or Aaron Halo asteroid clusters. Pure variant exposed in craters during Hathor Orbital Laser events ("Align and Mine"). Refine quickly at L1 orbital decks.
+        </li>
+        <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
+            <strong>Council Scrip</strong><br>
+            Earn from unverified council missions (headhunter/ambush) on Stanton planets (15 scrip each). Foxwell for MG scrip, other moons for Council. High-rep farming yields 12–15/hour.
+        </li>
+        <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
+            <strong>DCHS-05 Orbital Positioning Comp-Board</strong><br>
+            Contested Zones: Ruin Station vault (green key), Checkmate (red doors), Orbituary Hangar 30. Duplicate at printers for multiples; AFK farm green rooms safely.
+        </li>
+        <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
+            <strong>Government Cartography Agency Medal (Pristine)</strong><br>
+            Best from ace pilots in orange-level patrol contracts (Foxwell ~25% chance). Also random loot in Hurston/microTech derelict outposts and blue hangars/red rooms. Also sometimes in OLP loot rooms and NYX QV Warehouse.
+        </li>
+        <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
+            <strong>Irradiated Valakkar Pearl (AAA/AA) & Fang (Apex/Adult/Juvenile)</strong><br>
+            Valakkar worms in Lazarus (Pyro I) during Storm Breaker events. AAA/Apex from boss variants; adults easier for groups. Bring heavy weapons; farm during event windows.
+        </li>
+        <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
+            <strong>Jaclium (Ore)</strong><br>
+            Surface mining on Daymar/Yela or Aaron Halo asteroid belts. Use ROC or Prospector; look for high-density clusters. Refine at L1 orbital stations. Hand mine in craters during Hathor Orbital Laser events ("Align and Mine").
+        </li>
+        <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
+            <strong>Large Artefact Fragment (Pristine)</strong><br>
+            Loot from derelict outposts (Hurston/microTech), QV Station warehouses (blue boxes). 1 fragment per 5 warehouses; also salvage missions or random crates.
+        </li>
+        <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
+            <strong>MG Scrip</strong><br>
+            Verified mercenary contracts (Foxwell ambush/patrol, 15 scrip each), Gilly's Flight School missions. High-rep farms 132–165/hour. Trade 50 for 1 Wikelo Favor.
+        </li>
+        <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
+            <strong>NN-13 Cannon</strong><br>
+            Orbituary Hangar 30, Onyx Facilities; duplicate at printers. Also Wikelo Golem contracts or contested zones (6–7 needed for IKTI mods).
+        </li>
+        <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
+            <strong>Polaris Bit</strong><br>
+            Trade 24 SCU Quantainium via Wikelo’s "Want Polaris? Need something special" contract. Farm high-yield clusters in Aaron Halo belt.
+        </li>
+        <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
+            <strong>Quantainium</strong><br>
+            Aaron Halo asteroid belt (best clusters), Lyria caves, Aberdeen surface. Use Prospector; refine within 50 min before instability.
+        </li>
+        <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
+            <strong>RCMBNT-RGL-1 / -2 / -3</strong><br>
+            Jorrit Dossier: Project Hyperion in ASD Onyx Facilities. RGL from gravity labs, XTL from bio processors. Choose mission variants for specific drops.
+        </li>
+        <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
+            <strong>Tevarin War Service Marker (Pristine)</strong><br>
+            Ace pilots in orange patrol contracts (~25% chance). Also Hurston/microTech derelict outposts and blue hangars/red rooms. Also sometimes in OLP loot rooms and NYX QV Warehouse.
+        </li>
+        <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
+            <strong>Tundra Kopion Horn</strong><br>
+            Hunt Tundra Kopions on microTech (frozen biomes near New Babbage, e.g., MT Datacenter KH3 at 231°, 36.5km). Pack hunting yields best results, look for snow meets forest landscape.
+        </li>
+        <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
+            <strong>UEE 6th Platoon Medal (Pristine)</strong><br>
+            Ace pilots in orange patrol contracts (Foxwell ~25%). Also Hurston/microTech derelict blue hangars/red rooms and random loot. Also sometimes in OLP loot rooms and NYX QV Warehouse.
+        </li>
+        <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
+            <strong>Vanduul Metal / Plating</strong><br>
+            Salvage Vanduul wrecks in Pyro (higher drop from Scythe/Blade ships). Also Nyx Vanduul-Tech missions (Auxilia station yields ~8).
+        </li>
+        <li style="margin-bottom:16px; padding-bottom:12px;">
+            <strong>Yormandi Eye / Tongue</strong><br>
+            Yormandi boss in ASD Onyx Facilities (Site B research wing). Kill and extract after fight; trade with Wikelo for binoculars or other rewards.
+        </li>
+    </ul>
+
+    <p style="margin-top:0px; font-size:0.9em; color:#888; text-align:center;">
+        Tips updated for 4.0+. Check starcitizen.tools/Wikelo or community Discords for latest routes and event timers.
+    </p>
+
+</div>
+</div>
+
+<!-- Sections go here next -->
 
  <div class="section" id="a2-hercules-starlifter">
     <div class="section-header">
