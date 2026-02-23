@@ -241,7 +241,7 @@ td[data-tooltip]:hover::after {
         </div>
     </div>
 
-    <input type="text" class="search-box" id="search" placeholder="Search contracts, materials or rewards..." oninput="filterContracts()">
+    <input type="text" class="search-box" id="search" placeholder="Search contracts or rewards..." oninput="filterContracts()">
 
     <!-- Org sharing UI -->
     <div id="org-section">
@@ -1449,7 +1449,6 @@ td[data-tooltip]:hover::after {
     const db = firebase.database();
 
     // === Inventory & Traffic Light System ===
-    // List of all unique materials (expanded to cover your contracts)
     const materials = [
         { name: "Wikelo Favor", id: "wikelo-favor" },
         { name: "ASD Secure Drive", id: "asd" },
@@ -1482,18 +1481,13 @@ td[data-tooltip]:hover::after {
         { name: "Large Artefact Fragment (Pristine)", id: "large-artefact" },
         { name: "Tundra Kopion Horn", id: "tundra-kopion-horn" },
         { name: "Irradiated Kopion Horn", id: "irradiated-kopion-horn" }
-        // Add more if new contracts introduce unique items
     ];
 
-    // Save/load inventory separately
     const INVENTORY_KEY = 'wikeloInventory';
 
     function loadInventory() {
         const saved = localStorage.getItem(INVENTORY_KEY);
-        if (saved) {
-            return JSON.parse(saved);
-        }
-        return {};
+        return saved ? JSON.parse(saved) : {};
     }
 
     function saveInventory(inventory) {
@@ -1508,7 +1502,7 @@ td[data-tooltip]:hover::after {
             return;
         }
 
-        tableBody.innerHTML = ''; // Clear existing rows
+        tableBody.innerHTML = '';
         const inventory = loadInventory();
 
         materials.forEach(mat => {
@@ -1525,7 +1519,6 @@ td[data-tooltip]:hover::after {
             tableBody.appendChild(row);
         });
 
-        // Add change listeners to inventory inputs
         tableBody.querySelectorAll('input').forEach(input => {
             input.addEventListener('input', () => {
                 const inventory = loadInventory();
@@ -1562,18 +1555,12 @@ td[data-tooltip]:hover::after {
 
                 const have = inventory[matId] || 0;
 
-                if (have >= needed) {
-                    someMet = true;
-                } else {
-                    allMet = false;
-                }
+                if (have >= needed) someMet = true;
+                else allMet = false;
             });
 
-            if (allMet && requiredRows.length > 0) {
-                status = 'green';
-            } else if (someMet) {
-                status = 'yellow';
-            }
+            if (allMet && requiredRows.length > 0) status = 'green';
+            else if (someMet) status = 'yellow';
 
             light.className = `status-light ${status}`;
         });
@@ -1626,21 +1613,26 @@ td[data-tooltip]:hover::after {
             const percent = total > 0 ? (checked / total) * 100 : 0;
 
             const bar = section.querySelector('.progress-bar');
-            bar.style.width = percent + '%';
+            if (bar) bar.style.width = percent + '%';
 
             const container = section.querySelector('.progress-container');
-            if (percent >= 100) {
-                container.classList.add('progress-complete');
-            } else {
-                container.classList.remove('progress-complete');
+            if (container) {
+                if (percent >= 100) {
+                    container.classList.add('progress-complete');
+                } else {
+                    container.classList.remove('progress-complete');
+                }
             }
 
             totalProgress += percent;
         });
 
         const globalPercent = sections.length > 0 ? (totalProgress / sections.length) : 0;
-        document.getElementById('global-bar').style.width = globalPercent + '%';
-        document.getElementById('stats-text').textContent = `${completed}/${sections.length} Contracts Complete • Global Progress: ${Math.round(globalPercent)}%`;
+        const globalBar = document.getElementById('global-bar');
+        if (globalBar) globalBar.style.width = globalPercent + '%';
+
+        const statsText = document.getElementById('stats-text');
+        if (statsText) statsText.textContent = `${completed}/${sections.length} Contracts Complete • Global Progress: ${Math.round(globalPercent)}%`;
     }
 
     function resetProgress(sectionId) {
@@ -1655,9 +1647,7 @@ td[data-tooltip]:hover::after {
         if (confirm('Reset ALL progress? This will clear everything.')) {
             localStorage.removeItem(STORAGE_KEY);
             const orgCode = localStorage.getItem('orgCode');
-            if (orgCode) {
-                db.ref('orgs/' + orgCode).remove();
-            }
+            if (orgCode) db.ref('orgs/' + orgCode).remove();
             document.querySelectorAll('input[type="number"]').forEach(input => input.value = 0);
             document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
             updateAll();
@@ -1692,13 +1682,9 @@ td[data-tooltip]:hover::after {
             let hasIngredientMatch = false;
             section.querySelectorAll('tbody td:first-child').forEach(td => {
                 const ingredientText = td.textContent.toLowerCase();
-                if (ingredientText.includes(filter)) {
-                    hasIngredientMatch = true;
-                }
+                if (ingredientText.includes(filter)) hasIngredientMatch = true;
             });
-            const shouldShow = name.includes(filter) ||
-                               reward.includes(filter) ||
-                               hasIngredientMatch;
+            const shouldShow = name.includes(filter) || reward.includes(filter) || hasIngredientMatch;
             section.style.display = shouldShow ? 'block' : 'none';
         });
     }
@@ -1731,7 +1717,7 @@ td[data-tooltip]:hover::after {
         });
     }
 
-    // DOMContentLoaded: interactive setup only (no inventory init here)
+    // DOMContentLoaded: interactive setup only
     document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.section-header').forEach(header => {
             header.addEventListener('click', () => {
@@ -1754,14 +1740,12 @@ td[data-tooltip]:hover::after {
         }
     });
 
-    // window.onload: wait for full page load before initializing inventory table
+    // window.onload: wait for full page load before initializing inventory
     window.addEventListener('load', () => {
         updateInventoryTable();
         updateAllTrafficLights();
     });
-</script>
-</body>
+</script></body>
 </html>
 </body>
 </html>
-
