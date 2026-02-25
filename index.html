@@ -11,7 +11,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
 
     <style>
-        * { box-sizing: border-box; }
+    * { box-sizing: border-box; }
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -106,10 +106,9 @@ h1 {
 .header-columns { flex: 1; display: flex; align-items: center; gap: 20px; }
 .col-name { flex: 0 0 260px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #f0f0f0; }
 .col-progress {
-    flex: 1 1 300px;          /* grows to fill space, but starts at min 300px */
-    min-width: 300px;         /* prevents collapse on narrow */
-    max-width: 960px;         /* caps on wide screens */
-}
+    flex: 1 1 300px; /* grows to fill space, but starts at min 300px */
+    min-width: 300px; /* prevents collapse on narrow */
+    max-width: 960px; /* caps on wide screens */
 }
 .col-reward { flex: 1 1 auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #c0c0c0; font-size: 0.94em; }
 
@@ -171,7 +170,6 @@ td[data-tooltip]:hover::after {
     .section-header { font-size: 1.1em; padding: 12px; }
     .search-box { font-size: 0.9em; }
 }
-}
 
 @media print {
     body { background: white !important; color: #000 !important; padding: 10px !important; }
@@ -186,7 +184,8 @@ td[data-tooltip]:hover::after {
     .collected input { border: 1px dashed #777 !important; background: #f8f8f8 !important; color: #000 !important; }
     @page { size: A4 landscape; margin: 10mm; }
 }
-@media (max-width: 1000px) {  /* or try 1000px / 1100px if needed */
+
+@media (max-width: 1000px) { /* or try 1000px / 1100px if needed */
     .header-columns {
         flex-direction: column;
         align-items: flex-start;
@@ -215,17 +214,83 @@ td[data-tooltip]:hover::after {
     vertical-align: middle;
     box-shadow: 0 0 8px currentColor;
 }
-.status-light.red    { background: #c8102e; }
+.status-light.red { background: #c8102e; }
 .status-light.yellow { background: #ffaa00; }
-.status-light.green  { background: #4a704a; }
+.status-light.green { background: #4a704a; }
+
+/* Arrow rotation */
+/* Arrow rotation – now using .open class instead of [open] attribute */
+#quick-access-tabs .section-header > div:last-child {
+    transform: rotate(0deg);
+    transition: transform 0.3s ease;
+}
 
 
-    </style>
+/* Tab active style */
+.tab-header.active {
+    background: #3a1a22 !important;
+    border-color: #666 !important;
+    box-shadow: 0 0 8px rgba(200,16,46,0.4);
+}
+
+/* Smooth content switch */
+.tab-content {
+    transition: opacity 0.3s ease;
+}
+
+/* Ensure tab bar only shows when main section has .open class */
+#quick-access-tabs .tab-headers {
+    display: none;
+justify-content: center;
+    gap: 16px;          /* even spacing between tabs */
+    padding: 12px 16px;
+    background: #111118;
+    border-bottom: 1px solid #333;
+    flex-wrap: wrap;
+}
+#quick-access-tabs.open .tab-headers {
+    display: flex !important;
+}
+}
+#quick-access-tabs.open .tab-headers {
+    display: flex !important;
+}
+
+/* Force content area to expand when .open is present */
+#quick-access-tabs .section-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+}
+#quick-access-tabs.open .section-content {
+    max-height: 5000px !important;  /* large enough for any content */
+}
+/* Make sure content expands fully */
+#quick-access-tabs[open] .section-content {
+    max-height: 4000px !important; /* bigger than any realistic content */
+    padding: 0 !important; /* keep padding 0 as per your design */
+}
+/* Arrow rotation – target only the .arrow element */
+#quick-access-tabs .arrow {
+    transform: rotate(0deg);
+    transition: transform 0.3s ease;
+}
+#quick-access-tabs.open .arrow {
+    transform: rotate(180deg);
+}
+/* Optional: visual feedback when tab is active */
+.tab-header.active {
+    background: #3a1a22 !important;
+    border-color: #666 !important;
+    box-shadow: 0 0 8px rgba(200,16,46,0.4);
+}
+
+</style>
     <script data-goatcounter="https://wikelotracker.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
 </head>
 <body>
-    <body>
+    
     <div class="stars"></div>
     <h1>🪐 Bobby's Wikelo Tracker v4.6 🛸</h1>
     <p class="subtitle">Hunt → Claim Rewards – Progress saved automatically (local + shared via org code)</p>
@@ -251,141 +316,205 @@ td[data-tooltip]:hover::after {
         <input type="text" id="org-code" placeholder="e.g. Unique Name" />
         <button onclick="joinOrg()">Join / Create Org</button>
     </div>
-<!-- My Inventory Section -->
-<div class="section" id="inventory-section" style="background:#0a0a12; border:1px solid #222; margin:20px 0;">
-    <div class="section-header" style="background:linear-gradient(90deg, #111118, #1a1a22); border-bottom:1px solid #333; padding:16px 20px;">
-        <div style="text-align:center; width:100%;">
-            <div style="font-size:1.3em; font-weight:bold; color:#e0e0e0; margin-bottom:0px;">
-                My Inventory - Materials Stock
-            </div>
-            <div style="font-size:0.95em; color:#b0b0b0;">
-                Update your current cargo hold stock levels below
-            </div>
+
+
+<!-- ┌───────────────────────────────────────────────────────────────┐
+     │ Horizontal Tabs – Starts Collapsed – Kyle's Wikelo Tracker │
+     └───────────────────────────────────────────────────────────────┘ -->
+<!-- Horizontal Tabs – Starts Collapsed -->
+<div class="section" id="quick-access-tabs">
+    <!-- Main clickable header -->
+  <div class="section-header" style="background:linear-gradient(90deg, #1a0f14, #3a1a22); border-bottom:1px solid #333; padding:16px 20px; cursor:pointer;">
+    <div style="display:flex; justify-content:space-evenly; align-items:center; width:100%; gap:40px;">
+        <div style="font-size:1.3em; font-weight:bold; color:#e0e0e0; flex:1; text-align:center;">
+            Inventory
         </div>
-    </div>
-    <div class="section-content" style="padding:0px;">
-        <p style="text-align:center; color:#a0a0a0; margin:0 0 16px; font-size:0.95em;">
-            Enter your current stock of each material (from cargo/inventory).  
-    Colored dots on rewards update instantly:
-            <br><strong>Red</strong> = No items • <strong>Yellow</strong> = Some collected • <strong>Green</strong> = All items collected
-        </p>
-
-        <!-- Reset Inventory Button -->
-        <div style="text-align:center; margin:16px 0;">
-            <button onclick="if(confirm('Reset all inventory stock to zero?')) { localStorage.removeItem('wikeloInventory'); updateInventoryTable(); updateAllTrafficLights(); alert('Inventory reset!'); }"
-                    style="padding:8px 16px; background:#222; color:#ff6666; border:1px solid #444; border-radius:6px; cursor:pointer;">
-                Reset Inventory Stock
-            </button>
+        <div style="font-size:1.3em; font-weight:bold; color:#e0e0e0; flex:1; text-align:center;">
+            Tips
         </div>
-
-        <table style="width:100%; border-collapse:collapse; margin-top:10px;">
-            <thead>
-                <tr style="background:#1a1a22; color:#d0d0d0;">
-                    <th style="padding:12px 10px; text-align:left; border-bottom:1px solid #333;">Material</th>
-                    <th style="padding:12px 10px; text-align:center; border-bottom:1px solid #333; width:120px;">You Have</th>
-                </tr>
-            </thead>
-            <tbody id="inventory-table">
-                <!-- This tbody id is REQUIRED for JS to populate the rows dynamically -->
-            </tbody>
-        </table>
-    </div>
-</div>   
-
-<!-- Tips & Gathering Sources (side-by-side centered header, matched to My Inventory style) -->
-<div class="section" id="tips-sources" style="background:#0a0a12; border:1px solid #222; margin:20px 0;">
-    <div class="section-header" style="background:linear-gradient(90deg, #111118, #1a1a22); border-bottom:1px solid #333; padding:16px 20px; text-align:center;">
-        <div style="display:flex; justify-content:center; align-items:center; gap:200px; flex-wrap:wrap; max-width:900px; margin:0 auto;">
-            <div style="font-size:1.3em; font-weight:bold; color:#e0e0e0;">
-                Tips & Gathering Sources
-            </div>
-            <div style="font-size:0.95em; color:#e0e0e0;">
-                Best locations & methods for farming materials
-            </div>
+        <div style="font-size:1.3em; font-weight:bold; color:#e0e0e0; flex:1; text-align:center;">
+            Links
         </div>
+        <div class="arrow" style="font-size:0em; color:#b0b0b0; transition:transform 0.3s ease;">▼</div>
     </div>
- <div class="section-content" style="padding:0px 0px; text-align:left;">
-    <ul style="list-style:none; padding:0; margin:0 auto; max-width:1100px; font-size:1.1em; line-height:1.6; text-align:left; display:inline-block;">
-        <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
-            <strong>ASD Secure Drive</strong><br>
-            Farm via investigation contracts at ASD Onyx Facilities (Hurston & microTech bunkers). Fastest method: engineering wing speedruns (1–2 drives in 5–10 min). Also common in Jumptown events and 890 Jump wrecks.
-        </li>
-        <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
-            <strong>Carinite / Carinite (Pure)</strong><br>
-            Mine raw Carinite on Aberdeen, Lyria, or Aaron Halo asteroid clusters. Pure variant exposed in craters during Hathor Orbital Laser events ("Align and Mine"). Refine quickly at L1 orbital decks.
-        </li>
-        <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
-            <strong>Council Scrip</strong><br>
-            Earn from unverified council missions (headhunter/ambush) on Stanton planets (15 scrip each). Foxwell for MG scrip, other moons for Council. High-rep farming yields 12–15/hour.
-        </li>
-        <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
-            <strong>DCHS-05 Orbital Positioning Comp-Board</strong><br>
-            Contested Zones: Ruin Station vault (green key), Checkmate (red doors), Orbituary Hangar 30. Duplicate at printers for multiples; AFK farm green rooms safely.
-        </li>
-        <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
-            <strong>Government Cartography Agency Medal (Pristine)</strong><br>
-            Best from ace pilots in orange-level patrol contracts (Foxwell ~25% chance). Also random loot in Hurston/microTech derelict outposts and blue hangars/red rooms. Also sometimes in OLP loot rooms and NYX QV Warehouse.
-        </li>
-        <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
-            <strong>Irradiated Valakkar Pearl (AAA/AA) & Fang (Apex/Adult/Juvenile)</strong><br>
-            Valakkar worms in Lazarus (Pyro I) during Storm Breaker events. AAA/Apex from boss variants; adults easier for groups. Bring heavy weapons; farm during event windows.
-        </li>
-        <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
-            <strong>Jaclium (Ore)</strong><br>
-            Surface mining on Daymar/Yela or Aaron Halo asteroid belts. Use ROC or Prospector; look for high-density clusters. Refine at L1 orbital stations. Hand mine in craters during Hathor Orbital Laser events ("Align and Mine").
-        </li>
-        <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
-            <strong>Large Artefact Fragment (Pristine)</strong><br>
-            Loot from derelict outposts (Hurston/microTech), QV Station warehouses (blue boxes). 1 fragment per 5 warehouses; also salvage missions or random crates.
-        </li>
-        <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
-            <strong>MG Scrip</strong><br>
-            Verified mercenary contracts (Foxwell ambush/patrol, 15 scrip each), Gilly's Flight School missions. High-rep farms 132–165/hour. Trade 50 for 1 Wikelo Favor.
-        </li>
-        <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
-            <strong>NN-13 Cannon</strong><br>
-            Orbituary Hangar 30, Onyx Facilities; duplicate at printers. Also Wikelo Golem contracts or contested zones (6–7 needed for IKTI mods).
-        </li>
-        <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
-            <strong>Polaris Bit</strong><br>
-            Trade 24 SCU Quantainium via Wikelo’s "Want Polaris? Need something special" contract. Farm high-yield clusters in Aaron Halo belt.
-        </li>
-        <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
-            <strong>Quantainium</strong><br>
-            Aaron Halo asteroid belt (best clusters), Lyria caves, Aberdeen surface. Use Prospector; refine within 50 min before instability.
-        </li>
-        <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
-            <strong>RCMBNT-RGL-1 / -2 / -3</strong><br>
-            Jorrit Dossier: Project Hyperion in ASD Onyx Facilities. RGL from gravity labs, XTL from bio processors. Choose mission variants for specific drops.
-        </li>
-        <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
-            <strong>Tevarin War Service Marker (Pristine)</strong><br>
-            Ace pilots in orange patrol contracts (~25% chance). Also Hurston/microTech derelict outposts and blue hangars/red rooms. Also sometimes in OLP loot rooms and NYX QV Warehouse.
-        </li>
-        <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
-            <strong>Tundra Kopion Horn</strong><br>
-            Hunt Tundra Kopions on microTech (frozen biomes near New Babbage, e.g., MT Datacenter KH3 at 231°, 36.5km). Pack hunting yields best results, look for snow meets forest landscape.
-        </li>
-        <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
-            <strong>UEE 6th Platoon Medal (Pristine)</strong><br>
-            Ace pilots in orange patrol contracts (Foxwell ~25%). Also Hurston/microTech derelict blue hangars/red rooms and random loot. Also sometimes in OLP loot rooms and NYX QV Warehouse.
-        </li>
-        <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
-            <strong>Vanduul Metal / Plating</strong><br>
-            Salvage Vanduul wrecks in Pyro (higher drop from Scythe/Blade ships). Also Nyx Vanduul-Tech missions (Auxilia station yields ~8).
-        </li>
-        <li style="margin-bottom:16px; padding-bottom:12px;">
-            <strong>Yormandi Eye / Tongue</strong><br>
-            Yormandi boss in ASD Onyx Facilities (Site B research wing). Kill and extract after fight; trade with Wikelo for binoculars or other rewards.
-        </li>
-    </ul>
-
-    <p style="margin-top:0px; font-size:0.9em; color:#888; text-align:center;">
-        Tips updated for 4.0+. Check starcitizen.tools/Wikelo or community Discords for latest routes and event timers.
-    </p>
-
 </div>
+
+    <!-- Tab bar – hidden until main section opens -->
+    <div class="tab-headers" style="display:none; flex-wrap:wrap; justify-content:center; gap:8px; padding:12px 16px; background:#111118; border-bottom:1px solid #333;">
+        <div class="tab-header" data-tab="inventory" style="flex:1 1 220px; max-width:300px; padding:12px; background:#222; border:1px solid #444; border-radius:6px; cursor:pointer; text-align:center; color:#e0e0e0; font-weight:bold;">
+            My Inventory - Materials Stock
+        </div>
+        <div class="tab-header" data-tab="tips" style="flex:1 1 220px; max-width:300px; padding:12px; background:#222; border:1px solid #333; border-radius:6px; cursor:pointer; text-align:center; color:#e0e0e0; font-weight:bold;">
+            Tips & Gathering Sources
+        </div>
+        <div class="tab-header" data-tab="links" style="flex:1 1 220px; max-width:300px; padding:12px; background:#222; border:1px solid #333; border-radius:6px; cursor:pointer; text-align:center; color:#e0e0e0; font-weight:bold;">
+            Helpful Links & Tools
+        </div>
+    </div>
+
+    <!-- Content wrapper – controlled by [open] -->
+    <div class="section-content" style="padding:0; background:#0a0a12;">
+        <!-- Inventory (default visible) -->
+        <div id="tab-inventory" class="tab-content" style="padding:20px; display:block;">
+            <p style="text-align:center; color:#a0a0a0; margin:0 0 16px; font-size:0.95em;">
+                Enter your current stock of each material (from cargo/inventory).<br>
+                Colored dots on rewards update instantly:<br>
+                <strong>Red</strong> = No items • <strong>Yellow</strong> = Some collected • <strong>Green</strong> = All items collected
+            </p>
+            <div style="text-align:center; margin:16px 0;">
+                <button onclick="if(confirm('Reset all inventory stock to zero?')) { localStorage.removeItem('wikeloInventory'); updateInventoryTable(); updateAllTrafficLights(); alert('Inventory reset!'); }"
+                        style="padding:8px 16px; background:#222; color:#ff6666; border:1px solid #444; border-radius:6px; cursor:pointer;">
+                    Reset Inventory Stock
+                </button>
+            </div>
+            <table style="width:100%; border-collapse:collapse; margin-top:10px;">
+                <thead>
+                    <tr style="background:#1a1a22; color:#d0d0d0;">
+                        <th style="padding:12px 10px; text-align:left; border-bottom:1px solid #333;">Material</th>
+                        <th style="padding:12px 10px; text-align:center; border-bottom:1px solid #333; width:120px;">You Have</th>
+                    </tr>
+                </thead>
+                <tbody id="inventory-table"></tbody>
+            </table>
+        </div>
+
+        <!-- Tips -->
+        <div id="tab-tips" class="tab-content" style="display:none; padding:20px;">
+            <ul style="list-style:none; padding:0; margin:0 auto; max-width:1100px; font-size:1.1em; line-height:1.6;">
+                <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
+                    <strong>ASD Secure Drive</strong><br>
+                    Farm via investigation contracts at ASD Onyx Facilities (Hurston & microTech bunkers). Fastest method: engineering wing speedruns (1–2 drives in 5–10 min). Also common in Jumptown events and 890 Jump wrecks.
+                </li>
+                <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
+                    <strong>Carinite / Carinite (Pure)</strong><br>
+                    Mine raw Carinite on Aberdeen, Lyria, or Aaron Halo asteroid clusters. Pure variant exposed in craters during Hathor Orbital Laser events ("Align and Mine"). Refine quickly at L1 orbital decks.
+                </li>
+                <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
+                    <strong>Council Scrip</strong><br>
+                    Earn from unverified council missions (headhunter/ambush) on Stanton planets (15 scrip each). Foxwell for MG scrip, other moons for Council. High-rep farming yields 12–15/hour.
+                </li>
+                <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
+                    <strong>DCHS-05 Orbital Positioning Comp-Board</strong><br>
+                    Contested Zones: Ruin Station vault (green key), Checkmate (red doors), Orbituary Hangar 30. Duplicate at printers for multiples; AFK farm green rooms safely.
+                </li>
+                <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
+                    <strong>Government Cartography Agency Medal (Pristine)</strong><br>
+                    Best from ace pilots in orange-level patrol contracts (Foxwell ~25% chance). Also random loot in Hurston/microTech derelict outposts and blue hangars/red rooms. Also sometimes in OLP loot rooms and NYX QV Warehouse.
+                </li>
+                <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
+                    <strong>Irradiated Valakkar Pearl (AAA/AA) & Fang (Apex/Adult/Juvenile)</strong><br>
+                    Valakkar worms in Lazarus (Pyro I) during Storm Breaker events. AAA/Apex from boss variants; adults easier for groups. Bring heavy weapons; farm during event windows.
+                </li>
+                <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
+                    <strong>Jaclium (Ore)</strong><br>
+                    Surface mining on Daymar/Yela or Aaron Halo asteroid belts. Use ROC or Prospector; look for high-density clusters. Refine at L1 orbital stations. Hand mine in craters during Hathor Orbital Laser events ("Align and Mine").
+                </li>
+                <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
+                    <strong>Large Artefact Fragment (Pristine)</strong><br>
+                    Loot from derelict outposts (Hurston/microTech), QV Station warehouses (blue boxes). 1 fragment per 5 warehouses; also salvage missions or random crates.
+                </li>
+                <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
+                    <strong>MG Scrip</strong><br>
+                    Verified mercenary contracts (Foxwell ambush/patrol, 15 scrip each), Gilly's Flight School missions. High-rep farms 132–165/hour. Trade 50 for 1 Wikelo Favor.
+                </li>
+                <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
+                    <strong>NN-13 Cannon</strong><br>
+                    Orbituary Hangar 30, Onyx Facilities; duplicate at printers. Also Wikelo Golem contracts or contested zones (6–7 needed for IKTI mods).
+                </li>
+                <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
+                    <strong>Polaris Bit</strong><br>
+                    Trade 24 SCU Quantainium via Wikelo’s "Want Polaris? Need something special" contract. Farm high-yield clusters in Aaron Halo belt.
+                </li>
+                <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
+                    <strong>Quantainium</strong><br>
+                    Aaron Halo asteroid belt (best clusters), Lyria caves, Aberdeen surface. Use Prospector; refine within 50 min before instability.
+                </li>
+                <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
+                    <strong>RCMBNT-RGL-1 / -2 / -3</strong><br>
+                    Jorrit Dossier: Project Hyperion in ASD Onyx Facilities. RGL from gravity labs, XTL from bio processors. Choose mission variants for specific drops.
+                </li>
+                <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
+                    <strong>Tevarin War Service Marker (Pristine)</strong><br>
+                    Ace pilots in orange patrol contracts (~25% chance). Also Hurston/microTech derelict outposts and blue hangars/red rooms. Also sometimes in OLP loot rooms and NYX QV Warehouse.
+                </li>
+                <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
+                    <strong>Tundra Kopion Horn</strong><br>
+                    Hunt Tundra Kopions on microTech (frozen biomes near New Babbage, e.g., MT Datacenter KH3 at 231°, 36.5km). Pack hunting yields best results, look for snow meets forest landscape.
+                </li>
+                <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
+                    <strong>UEE 6th Platoon Medal (Pristine)</strong><br>
+                    Ace pilots in orange patrol contracts (Foxwell ~25%). Also Hurston/microTech derelict blue hangars/red rooms and random loot. Also sometimes in OLP loot rooms and NYX QV Warehouse.
+                </li>
+                <li style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #333;">
+                    <strong>Vanduul Metal / Plating</strong><br>
+                    Salvage Vanduul wrecks in Pyro (higher drop from Scythe/Blade ships). Also Nyx Vanduul-Tech missions (Auxilia station yields ~8).
+                </li>
+                <li style="margin-bottom:16px; padding-bottom:12px;">
+                    <strong>Yormandi Eye / Tongue</strong><br>
+                    Yormandi boss in ASD Onyx Facilities (Site B research wing). Kill and extract after fight; trade with Wikelo for binoculars or other rewards.
+                </li>
+            </ul>
+            <p style="margin-top:20px; font-size:0.9em; color:#888; text-align:center;">
+                Tips updated for 4.0+. Check starcitizen.tools/Wikelo or community Discords for latest routes.
+            </p>
+        </div>
+
+        <!-- Links -->
+        <div id="tab-links" class="tab-content" style="display:none; padding:20px;">
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:16px; max-width:1400px; margin:0 auto;">
+                <a href="https://undisputednoobs.com/" target="_blank" rel="noopener" style="text-decoration:none; color:inherit;">
+                    <div style="background:#111118; border:1px solid #333; border-radius:8px; padding:12px; transition:transform 0.2s; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                        <div style="font-weight:bold; color:#e0e0e0; font-size:0.9em; margin-bottom:4px; text-align:center;">Undisputed Noobs</div>
+                    </div>
+                </a>
+                <a href="https://starcitizen.tools/" target="_blank" rel="noopener" style="text-decoration:none; color:inherit;">
+                    <div style="background:#111118; border:1px solid #333; border-radius:8px; padding:12px; transition:transform 0.2s; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                        <div style="font-weight:bold; color:#e0e0e0; font-size:0.9em; margin-bottom:4px; text-align:center;">Star Citizen Tools Wiki</div>
+                    </div>
+                </a>
+                <a href="https://uexcorp.space/" target="_blank" rel="noopener" style="text-decoration:none; color:inherit;">
+                    <div style="background:#111118; border:1px solid #333; border-radius:8px; padding:12px; transition:transform 0.2s; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                        <div style="font-weight:bold; color:#e0e0e0; font-size:0.9em; margin-bottom:4px; text-align:center;">UEX</div>
+                    </div>
+                </a>
+                <a href="https://gallog.co/" target="_blank" rel="noopener" style="text-decoration:none; color:inherit;">
+                    <div style="background:#111118; border:1px solid #333; border-radius:8px; padding:12px; transition:transform 0.2s; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                        <div style="font-weight:bold; color:#e0e0e0; font-size:0.9em; margin-bottom:4px; text-align:center;">Gallog Finder</div>
+                    </div>
+                </a>
+                <a href="https://scfocus.org/" target="_blank" rel="noopener" style="text-decoration:none; color:inherit;">
+                    <div style="background:#111118; border:1px solid #333; border-radius:8px; padding:12px; transition:transform 0.2s; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                        <div style="font-weight:bold; color:#e0e0e0; font-size:0.9em; margin-bottom:4px; text-align:center;">SC Focus</div>
+                    </div>
+                </a>
+                <a href="https://versemate.com/" target="_blank" rel="noopener" style="text-decoration:none; color:inherit;">
+                    <div style="background:#111118; border:1px solid #333; border-radius:8px; padding:12px; transition:transform 0.2s; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                        <div style="font-weight:bold; color:#e0e0e0; font-size:0.9em; margin-bottom:4px; text-align:center;">VerseMate</div>
+                    </div>
+                </a>
+                <a href="https://www.erkul.games/" target="_blank" rel="noopener" style="text-decoration:none; color:inherit;">
+                    <div style="background:#111118; border:1px solid #333; border-radius:8px; padding:12px; transition:transform 0.2s; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                        <div style="font-weight:bold; color:#e0e0e0; font-size:0.9em; margin-bottom:4px; text-align:center;">Erkul.games</div>
+                    </div>
+                </a>
+                <a href="https://starcitizen.tools/Ship_Matrix" target="_blank" rel="noopener" style="text-decoration:none; color:inherit;">
+                    <div style="background:#111118; border:1px solid #333; border-radius:8px; padding:12px; transition:transform 0.2s; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                        <div style="font-weight:bold; color:#e0e0e0; font-size:0.9em; margin-bottom:4px; text-align:center;">Ship Matrix</div>
+                    </div>
+                </a>
+                <a href="https://sc-trade.tools/home" target="_blank" rel="noopener" style="text-decoration:none; color:inherit;">
+                    <div style="background:#111118; border:1px solid #333; border-radius:8px; padding:12px; transition:transform 0.2s; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                        <div style="font-weight:bold; color:#e0e0e0; font-size:0.9em; margin-bottom:4px; text-align:center;">SC-Trade Tools</div>
+                    </div>
+                </a>
+            </div>
+            <p style="margin:24px 0 0; font-size:0.85em; color:#777; text-align:center;">
+                All links are community-run. Not affiliated with CIG/RSI.
+            </p>
+        </div>
+    </div>
 </div>
+
 
 <!-- Sections go here next -->
 
@@ -1826,8 +1955,8 @@ td[data-tooltip]:hover::after {
         });
     }
 
-    // DOMContentLoaded: interactive setup only
     document.addEventListener('DOMContentLoaded', () => {
+        // Your existing code – keep all of this
         document.querySelectorAll('.section-header').forEach(header => {
             header.addEventListener('click', () => {
                 const section = header.parentElement;
@@ -1847,6 +1976,70 @@ td[data-tooltip]:hover::after {
             document.getElementById('org-code').value = savedCode;
             loadSharedProgress(savedCode);
         }
+
+        // Horizontal Tabs – debug version
+        console.log("Tabs script running...");
+
+        const quickTabs = document.getElementById('quick-access-tabs');
+        if (!quickTabs) {
+            console.error("quick-access-tabs element NOT found in DOM");
+            return;
+        }
+
+        console.log("Found quick-access-tabs");
+
+        const mainHeader = quickTabs.querySelector('.section-header');
+        const tabHeaders = quickTabs.querySelectorAll('.tab-header');
+        const tabContents = quickTabs.querySelectorAll('.tab-content');
+
+        if (!mainHeader) {
+            console.error("Main section-header not found inside quick-access-tabs");
+            return;
+        }
+
+        if (tabHeaders.length === 0) {
+            console.error("No .tab-header elements found");
+            return;
+        }
+
+        console.log(`Found ${tabHeaders.length} tab headers`);
+
+     mainHeader.addEventListener('click', (e) => {
+    if (e.target.closest('.tab-header')) return;
+    quickTabs.classList.toggle('open');
+    console.log('Main header clicked → open class now:', quickTabs.classList.contains('open'));
+});
+
+        // Tab clicks
+        tabHeaders.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const tabId = tab.dataset.tab;
+                console.log(`Tab clicked: ${tabId}`);
+
+                tabHeaders.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                tabContents.forEach(c => {
+                    if (c.id === `tab-${tabId}`) {
+                        c.style.display = c.style.display === 'block' ? 'none' : 'block';
+                        console.log(`Toggled ${tabId} → display: ${c.style.display}`);
+                    } else {
+                        c.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // Pre-select first tab
+        if (tabHeaders.length > 0) {
+            tabHeaders[0].classList.add('active');
+            const firstContent = document.getElementById('tab-inventory');
+            if (firstContent) {
+                firstContent.style.display = 'block';
+                console.log("First tab (inventory) pre-activated and shown");
+            }
+        }
     });
 
     // window.onload: wait for full page load before initializing inventory
@@ -1856,8 +2049,5 @@ td[data-tooltip]:hover::after {
     });
 </script></body>
 </html>
-</body>
-</html>
-
 
 
