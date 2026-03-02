@@ -84,7 +84,7 @@ h1 {
 
 .stats { text-align: center; margin: 0 0 20px; font-size: 1.1em; color: #a0a0a0; }
 .global-progress { width: 80%; max-width: 600px; height: 20px; background: #222; border-radius: 10px; overflow: hidden; margin: 10px auto; box-shadow: inset 0 1px 3px #000; }
-.global-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #8b0000, #c8102e); transition: width 1s ease; }
+.global-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #2563eb, #0ea5e9); transition: width 1s ease; }
 
 .search-box {
     width: 100%; max-width: 400px; padding: 10px; margin: 20px 0 20px; display: block;
@@ -98,13 +98,13 @@ h1 {
 }
 
 .section-header {
-    background: linear-gradient(90deg, rgba(139,0,0,0.25), rgba(200,16,46,0.15));
+    background: linear-gradient(90deg, rgba(37,99,235,0.22), rgba(14,165,233,0.12));
     padding: 14px 16px; cursor: pointer; user-select: none;
     display: flex; justify-content: space-between; align-items: center;
-    font-size: 1.22em; color: #f0f0f0; text-shadow: 0 0 4px #8b0000;
+    font-size: 1.22em; color: #f0f0f0; text-shadow: none;
 }
 
-.section-header:hover { background: linear-gradient(90deg, rgba(139,0,0,0.4), rgba(200,16,46,0.3)); }
+.section-header:hover { background: linear-gradient(90deg, rgba(37,99,235,0.22), rgba(14,165,233,0.14)); }
 
 .section-header::after { content: '▼'; font-size: 1em; transition: transform 0.3s; }
 .section[open] .section-header::after { transform: rotate(180deg); }
@@ -119,11 +119,11 @@ h1 {
 .col-reward { flex: 1 1 auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #c0c0c0; font-size: 0.94em; }
 
 .progress-container { background: #222; border-radius: 8px; height: 20px; overflow: hidden; box-shadow: inset 0 1px 3px #000; }
-.progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #8b0000, #c8102e); transition: width 0.8s cubic-bezier(0.4,0,0.2,1); }
+.progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #2563eb, #0ea5e9); transition: width 0.8s cubic-bezier(0.4,0,0.2,1); }
 .progress-complete .progress-bar { background: linear-gradient(90deg, #4a704a, #6a906a); }
 
 .section-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease, padding 0.3s ease; padding: 0 16px; position: relative; }
-.section[open] .section-content { max-height: 2000px; padding: 14px 16px; }
+.section[open] .section-content { max-height: 12000px; padding: 14px 16px; }
 
 .reset-btn {
     position: absolute; top: 10px; right: 16px; padding: 6px 12px;
@@ -179,11 +179,12 @@ td[data-tooltip]:hover::after {
 
 @media print {
     body { background: white !important; color: #000 !important; padding: 10px !important; }
-    .stars, .controls, .stats, .search-box, .footer, #org-section { display: none !important; }
+    .topbar, .stars, .controls, .stats, .search-box, .footer, #org-section { display: none !important; }
     h1, .subtitle { text-align: left !important; color: #000 !important; text-shadow: none; }
     .section-header { background: #f0f0f0 !important; color: #000 !important; text-shadow: none; }
     .progress-container { display: none !important; }
-    .section-content { max-height: none !important; padding: 10px 12px !important; }
+    .section-content { max-height: none !important; overflow: visible !important; padding: 10px 12px !important; }
+    .contracts-grid { display: block !important; max-width: none !important; padding: 0 !important; }
     table { background: white !important; }
     th { background: #e8e8e8 !important; color: #000 !important; }
     td { border-bottom: 1px solid #ccc !important; color: #000 !important; }
@@ -257,7 +258,7 @@ justify-content: center;
 #quick-access-tabs.open .tab-headers {
     display: flex !important;
 }
-}
+
 #quick-access-tabs.open .tab-headers {
     display: flex !important;
 }
@@ -291,28 +292,291 @@ justify-content: center;
     box-shadow: 0 0 8px rgba(200,16,46,0.4);
 }
 
+/* =========================================================
+   Professional layout + less scrolling (non-destructive)
+   ========================================================= */
+:root{
+    --surface: rgba(16, 16, 22, 0.72);
+    --surface-solid: #12121a;
+    --border: rgba(255,255,255,0.10);
+    --text: #e7e7ea;
+    --muted: rgba(231,231,234,0.72);
+    --accent: #2563eb;
+    --accent-2: #0ea5e9;
+    --shadow: 0 10px 30px rgba(0,0,0,0.45);
+}
+
+body{ color: var(--text); }
+
+/* Remove excess whitespace below the top controls */
+.controls{
+    margin: 8px 0 10px !important;
+    gap: 10px;
+}
+
+/* Sticky top area so you don’t have to scroll back up */
+.topbar{
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: linear-gradient(180deg, rgba(10,10,18,0.86) 0%, rgba(10,10,18,0.70) 100%);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+.topbar-inner{
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 12px 14px;
+}
+h1.page-title{
+    text-align: left;
+    margin: 2px 0 8px;
+    font-size: 1.45em;
+    letter-spacing: 0.2px;
+    text-shadow: none;
+}
+.topbar-row{
+    display:flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+.topbar-metrics{
+    display:flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1 1 420px;
+    min-width: 320px;
+}
+.stats{
+    margin: 0 !important;
+    text-align: left;
+    color: var(--muted);
+    font-size: 0.98em;
+}
+.global-progress{
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid var(--border);
+}
+.global-bar{
+    background: linear-gradient(90deg, var(--accent), var(--accent-2)) !important;
+}
+
+/* Buttons: calmer + consistent */
+.print-btn, .reset-all-btn, .share-btn{
+    border-radius: 12px !important;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.35) !important;
+}
+.print-btn, .share-btn{
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%) !important;
+}
+.reset-all-btn{
+    background: linear-gradient(135deg, #30303a 0%, #1f1f26 100%) !important;
+}
+
+/* Contracts shown in a responsive grid to cut down scrolling */
+.contracts-grid{
+    max-width: 1600px;
+    margin: 10px auto 0;
+    padding: 0 10px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    align-items: start;
+}
+.contracts-grid > .section{
+    margin: 0 !important;
+    background: rgba(18,18,26,0.78);
+    border: 1px solid var(--border);
+}
+
+/* Compact "rectangle" headers inside the grid:
+   Name + Reward on first row, Progress below */
+.contracts-grid .header-columns{
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      "name reward"
+      "progress progress";
+    align-items: center;
+    column-gap: 12px;
+    row-gap: 8px;
+}
+.contracts-grid .col-name{
+    grid-area: name;
+    width: auto;
+    flex: 0 0 auto;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 1.02em;
+}
+.contracts-grid .col-progress{
+    grid-area: progress;
+    width: 100%;
+    min-width: 100%;
+    max-width: none;
+}
+.contracts-grid .progress-container{
+    height: 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.08);
+}
+.contracts-grid .progress-bar{
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+}
+.contracts-grid .col-reward{
+    grid-area: reward;
+    width: auto;
+    flex: 0 0 auto;
+    white-space: nowrap;
+    overflow: visible;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+    font-size: 0.92em;
+    color: var(--muted);
+}
+.contracts-grid .status-light{
+    flex: 0 0 auto;
+}
+
+.contracts-grid .section-header{
+    padding: 10px 12px;
+    font-size: 1.02em;
+}
+
+/* Exactly 3 contracts per row (desktop), 2 on medium */
+@media (min-width: 980px){
+    .contracts-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 1280px){
+    .contracts-grid{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* Contract header should only show: Name + Progress + Light */
+.contracts-grid .section-header::after{
+    content: '' !important;
+}
+.contracts-grid .header-columns{
+    grid-template-areas:
+      "name indicator"
+      "progress progress";
+}
+.contracts-grid .col-reward{
+    grid-area: indicator;
+    font-size: 0 !important;  /* hides reward text while keeping the traffic-light span visible */
+    gap: 0 !important;
+    color: transparent !important;
+}
+.contracts-grid .col-reward strong{ display:none !important; }
+.contracts-grid .status-light{
+    width: 12px;
+    height: 12px;
+    margin-left: 0;
+    box-shadow: 0 0 10px currentColor;
+}
+
+.reward-line{
+    margin: 0 0 10px;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: rgba(0,0,0,0.22);
+    color: var(--muted);
+    font-size: 0.92em;
+}
+
+/* Match the same centered width for the tabs section */
+#quick-access-tabs{
+    max-width: 1600px;
+    margin: 14px auto 0;
+    border: 1px solid var(--border);
+    background: rgba(18,18,26,0.78);
+    box-shadow: var(--shadow);
+}
+
+/* Make Inventory/Tips/Links match the professional blue scheme (override inline styles) */
+#quick-access-tabs .section-header{
+    background: linear-gradient(90deg, rgba(37,99,235,0.22), rgba(14,165,233,0.12)) !important;
+    text-shadow: none !important;
+}
+#quick-access-tabs .tab-headers{
+    background: rgba(10,10,18,0.55) !important;
+    border-bottom: 1px solid var(--border) !important;
+}
+#quick-access-tabs .tab-header{
+    border: 1px solid var(--border) !important;
+    background: rgba(255,255,255,0.06) !important;
+}
+#quick-access-tabs .tab-header.active{
+    background: linear-gradient(135deg, rgba(37,99,235,0.30), rgba(14,165,233,0.18)) !important;
+    border-color: rgba(37,99,235,0.55) !important;
+    box-shadow: 0 0 0 1px rgba(37,99,235,0.25), 0 10px 24px rgba(0,0,0,0.35) !important;
+}
+
+/* Make the big background image subtle (more professional) */
+.wikelo-bg img{
+    opacity: 0.80 !important;
+    filter: brightness(0.78) contrast(1.12) saturate(1.05) !important;
+}
+
+@media (max-width: 520px){
+    .contracts-grid{
+        grid-template-columns: 1fr;
+        padding: 0 10px;
+    }
+    .topbar-inner{ padding: 10px; }
+    h1.page-title{ font-size: 1.25em; }
+}
+
 </style>
     <script data-goatcounter="https://wikelotracker.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
 </head>
 <body>
     <!-- Fixed Wikelo background – stays in place on scroll -->
-<div style="position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: -2; overflow: hidden; background: #0d0d14;">
+<div class="wikelo-bg" style="position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: -2; overflow: hidden; background: #0d0d14;">
     <img src="https://github.com/BobbyBull2/Wikelo_Tracker/blob/root/content.png?raw=true" alt="Wikelo background" 
-         style="width: 100%; height: 100%; object-fit: cover; opacity: 4.00; filter: brightness(0.7) contrast(1.1);">
+         style="width: 100%; height: 100%; object-fit: cover; opacity: 0.80; filter: brightness(0.78) contrast(1.12) saturate(1.05);">
 </div>
     <div class="stars"></div>
-    <h1>Bobby's Wikelo Tracker v4.6</h1>
-        <div class="controls">
-        <button class="print-btn" onclick="window.print()">🖨️ Print (Landscape)</button>
-        <button class="reset-all-btn" onclick="resetAll()">Reset All Progress</button>
-        <button class="share-btn" onclick="shareProgress()">Share Progress</button>
-    </div>
+
+    <div class="topbar">
+      <div class="topbar-inner">
+        <div class="topbar-row">
+          <h1 class="page-title">Bobby's Wikelo Tracker v4.6</h1>
+          <div class="controls">
+            <button class="print-btn" onclick="window.print()">🖨️ Print (Landscape)</button>
+            <button class="reset-all-btn" onclick="resetAll()">Reset All Progress</button>
+            <button class="share-btn" onclick="shareProgress()">Share Progress</button>
+            <button class="share-btn" onclick="expandAllContracts()">Expand All</button>
+            <button class="reset-all-btn" onclick="collapseAllContracts()">Collapse All</button>
+          </div>
+        </div>
+
+        <div class="topbar-row" style="margin-top: 8px;">
+          <div class="topbar-metrics">
+            <div class="stats" id="stats-text">Loading progress…</div>
+            <div class="global-progress" aria-label="Global progress">
+              <div class="global-bar" id="global-bar"></div>
+            </div>
+          </div>
+        </div>
 
   
 
 <!-- Combined search + org sharing row – PERFECTLY level, minimal bottom space -->
-<div style="display: flex; flex-wrap: wrap; gap: 30px; align-items: center; margin: 20px 0 10px;">
+<div style="display: flex; flex-wrap: wrap; gap: 30px; align-items: center; margin: 12px 0 0;">
     <!-- Search box – exact height match -->
     <div style="flex: 1 1 300px; min-width: 280px;">
         <input type="text" class="search-box" id="search" placeholder="Search contracts or rewards..." oninput="filterContracts()"
@@ -350,6 +614,9 @@ justify-content: center;
     </div>
 </div>
 
+      </div>
+    </div>
+
 <!-- ┌───────────────────────────────────────────────────────────────┐
      │ Horizontal Tabs – Starts Collapsed – Kyle's Wikelo Tracker │
      └───────────────────────────────────────────────────────────────┘ -->
@@ -367,7 +634,7 @@ justify-content: center;
         <div style="font-size:1.3em; font-weight:bold; color:#e0e0e0; flex:1; text-align:center;">
             Links
         </div>
-        <div class="arrow" style="font-size:0em; color:#b0b0b0; transition:transform 0.3s ease;">▼</div>
+        <div class="arrow" style="font-size:1em; color:#b0b0b0; transition:transform 0.3s ease;">▼</div>
     </div>
 </div>
 
@@ -539,6 +806,11 @@ justify-content: center;
                         <div style="font-weight:bold; color:#e0e0e0; font-size:0.9em; margin-bottom:4px; text-align:center;">SC-Trade Tools</div>
                     </div>
                 </a>
+                  <a href="https://robertsspaceindustries.com/en/" target="_blank" rel="noopener" style="text-decoration:none; color:inherit;">
+                    <div style="background:#111118; border:1px solid #333; border-radius:8px; padding:12px; transition:transform 0.2s; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                        <div style="font-weight:bold; color:#e0e0e0; font-size:0.9em; margin-bottom:4px; text-align:center;">Robert Space Industries</div>
+                    </div>
+                </a>
             </div>
             <p style="margin:24px 0 0; font-size:0.85em; color:#777; text-align:center;">
                 All links are community-run. Not affiliated with CIG/RSI.
@@ -549,6 +821,8 @@ justify-content: center;
 
 
 <!-- Sections go here next -->
+
+<div id="contracts-grid" class="contracts-grid">
 
  <div class="section" id="a2-hercules-starlifter">
     <div class="section-header">
@@ -1682,6 +1956,8 @@ justify-content: center;
 <!-- End of all 50 sections -->
 
 
+</div>
+
 <div class="footer">
     <div style="text-align:center; margin:40px 0 20px; padding:14px; background:rgba(0,0,0,0.55); border-radius:10px;">
         <h3 style="color:#ffcc00; margin:0; font-family:'Orbitron', sans-serif; font-weight:700; letter-spacing:1px;">
@@ -1801,7 +2077,7 @@ justify-content: center;
     function updateAllTrafficLights() {
         const inventory = loadInventory();
 
-        document.querySelectorAll('.section').forEach(section => {
+        getContractSections().forEach(section => {
             const contractId = section.id;
             const light = section.querySelector(`.status-light[data-contract-id="${contractId}"]`);
             if (!light) return;
@@ -1837,6 +2113,45 @@ justify-content: center;
     }
 
     const STORAGE_KEY = 'wikeloChecklistData';
+
+    function getContractSections() {
+        return Array.from(document.querySelectorAll('.section')).filter(section => {
+            if (!section?.id) return false;
+            if (section.id === 'quick-access-tabs') return false;
+            return !!section.querySelector('.col-name') && !!section.querySelector('.col-reward');
+        });
+    }
+
+    function expandAllContracts() {
+        getContractSections().forEach(section => section.setAttribute('open', ''));
+    }
+
+    function collapseAllContracts() {
+        getContractSections().forEach(section => section.removeAttribute('open'));
+    }
+
+    function ensureRewardLines() {
+        getContractSections().forEach(section => {
+            const content = section.querySelector('.section-content');
+            if (!content) return;
+            if (content.querySelector('.reward-line')) return;
+
+            const rewardEl = section.querySelector('.col-reward');
+            if (!rewardEl) return;
+
+            const rewardClone = rewardEl.cloneNode(true);
+            rewardClone.querySelectorAll?.('.status-light')?.forEach?.(n => n.remove());
+
+            const raw = (rewardClone.textContent || '').trim();
+            const rewardText = raw.replace(/^reward:\s*/i, '').trim();
+            if (!rewardText) return;
+
+            const line = document.createElement('div');
+            line.className = 'reward-line';
+            line.textContent = `Reward: ${rewardText}`;
+            content.insertBefore(line, content.firstChild);
+        });
+    }
 
     function loadData() {
         const saved = localStorage.getItem(STORAGE_KEY);
@@ -1874,7 +2189,7 @@ justify-content: center;
     function updateAll() {
         let completed = 0;
         let totalProgress = 0;
-        const sections = document.querySelectorAll('.section');
+        const sections = getContractSections();
 
         sections.forEach(section => {
             const checkboxes = section.querySelectorAll('input[type="checkbox"]');
@@ -1889,6 +2204,7 @@ justify-content: center;
             if (container) {
                 if (percent >= 100) {
                     container.classList.add('progress-complete');
+                    completed += 1;
                 } else {
                     container.classList.remove('progress-complete');
                 }
@@ -1927,9 +2243,13 @@ justify-content: center;
 
     function shareProgress() {
         let text = "My Wikelo Contract Progress:\n\n";
-        document.querySelectorAll('.section').forEach(section => {
-            const name = section.querySelector('.col-name').textContent.trim();
-            const reward = section.querySelector('.col-reward').textContent.trim();
+        getContractSections().forEach(section => {
+            const nameEl = section.querySelector('.col-name');
+            const rewardEl = section.querySelector('.col-reward');
+            if (!nameEl || !rewardEl) return;
+
+            const name = nameEl.textContent.trim();
+            const reward = rewardEl.textContent.trim();
             const checkboxes = section.querySelectorAll('input[type="checkbox"]');
             const completed = Array.from(checkboxes).filter(cb => cb.checked).length;
             const total = checkboxes.length;
@@ -1946,7 +2266,7 @@ justify-content: center;
 
     function filterContracts() {
         const filter = document.getElementById('search').value.toLowerCase().trim();
-        document.querySelectorAll('.section').forEach(section => {
+        getContractSections().forEach(section => {
             const name = section.querySelector('.col-name')?.textContent.toLowerCase() || '';
             const reward = section.querySelector('.col-reward')?.textContent.toLowerCase() || '';
             let hasIngredientMatch = false;
@@ -1955,7 +2275,7 @@ justify-content: center;
                 if (ingredientText.includes(filter)) hasIngredientMatch = true;
             });
             const shouldShow = name.includes(filter) || reward.includes(filter) || hasIngredientMatch;
-            section.style.display = shouldShow ? 'block' : 'none';
+            section.style.display = shouldShow ? '' : 'none';
         });
     }
 
@@ -1992,6 +2312,8 @@ justify-content: center;
         document.querySelectorAll('.section-header').forEach(header => {
             header.addEventListener('click', () => {
                 const section = header.parentElement;
+                if (!section) return;
+                if (section.id === 'quick-access-tabs') return;
                 section.toggleAttribute('open');
             });
         });
@@ -2001,6 +2323,7 @@ justify-content: center;
             input.addEventListener('input', saveData);
         });
 
+        ensureRewardLines();
         loadData();
 
         const savedCode = localStorage.getItem('orgCode');
