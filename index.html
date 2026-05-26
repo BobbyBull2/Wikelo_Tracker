@@ -245,7 +245,7 @@ td[data-tooltip]:hover::after {
 .status-light.yellow { background: #ffaa00; }
 .status-light.green { background: #4a704a; }
 
-/* ==================== QUICK ACCESS TABS - FINAL VERSION ==================== */
+/* ==================== QUICK ACCESS TABS - FIXED ==================== */
 
 #quick-access-tabs {
     max-width: 1600px;
@@ -263,22 +263,22 @@ td[data-tooltip]:hover::after {
     padding: 16px 20px;
     cursor: pointer;
     font-size: 1.2em;
+    font-weight: 500;
 }
 
-/* SINGLE ARROW ONLY */
+/* Arrow */
 #quick-access-tabs .section-header::after {
     content: '▼' !important;
     font-size: 1.4em;
     transition: transform 0.3s ease;
     margin-left: auto;
-    padding-left: 12px;
 }
 
 #quick-access-tabs.open .section-header::after {
     transform: rotate(180deg) !important;
 }
 
-/* Tab Bar Labels */
+/* THE IMPORTANT PART - Tab Bar with Labels */
 #quick-access-tabs .tab-headers {
     display: none;
     justify-content: center;
@@ -297,11 +297,12 @@ td[data-tooltip]:hover::after {
 .tab-header {
     padding: 10px 26px;
     color: #eee;
-    background: rgba(255,255,255,0.09);
+    background: rgba(255,255,255,0.1);
     border: 1px solid #666;
     border-radius: 6px;
     cursor: pointer;
     font-size: 1.05em;
+    white-space: nowrap;
 }
 
 .tab-header:hover {
@@ -314,7 +315,7 @@ td[data-tooltip]:hover::after {
     color: white;
 }
 
-/* Content */
+/* Content Area */
 #quick-access-tabs .section-content {
     max-height: 0;
     overflow: hidden;
@@ -325,13 +326,6 @@ td[data-tooltip]:hover::after {
 #quick-access-tabs.open .section-content {
     max-height: 15000px !important;
     padding: 20px;
-}
-
-/* KILL ALL OTHER ARROWS */
-#quick-access-tabs .arrow,
-#quick-access-tabs .section-header > div:last-child,
-#quick-access-tabs .section-header::before {
-    display: none !important;
 }
 /* =========================================================
    Professional layout + less scrolling (non-destructive)
