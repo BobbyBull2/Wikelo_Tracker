@@ -247,35 +247,48 @@ td[data-tooltip]:hover::after {
 
 /* ==================== QUICK ACCESS TABS (Clean + Visible Labels) ==================== */
 
+/* ==================== QUICK ACCESS TABS - FINAL FIXED VERSION ==================== */
+
+#quick-access-tabs {
+    max-width: 1600px;
+    margin: 14px auto 0;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(18,18,26,0.9);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
 #quick-access-tabs .section-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 16px;
+    padding: 14px 18px;
     cursor: pointer;
+    font-size: 1.15em;
+    font-weight: 500;
 }
 
-/* Main Arrow on the right */
+/* Single clean arrow on the right */
 #quick-access-tabs .section-header::after {
     content: '▼' !important;
-    font-size: 1.25em;
+    font-size: 1.3em;
     transition: transform 0.3s ease;
     margin-left: auto;
 }
 
-/* Rotate arrow */
+/* Rotate when open */
 #quick-access-tabs.open .section-header::after {
     transform: rotate(180deg) !important;
 }
 
-/* Tab Bar (Inventory, Tips, Links) */
+/* Tab Bar - Inventory | Tips | Links */
 #quick-access-tabs .tab-headers {
     display: none;
     justify-content: center;
-    gap: 16px;
+    gap: 12px;
     padding: 12px 16px;
-    background: #111118;
-    border-bottom: 1px solid #444;
+    background: #1a1a22;
+    border-top: 1px solid #333;
     flex-wrap: wrap;
 }
 
@@ -283,29 +296,28 @@ td[data-tooltip]:hover::after {
     display: flex !important;
 }
 
-/* Individual Tab Buttons */
+/* Individual Tabs */
 .tab-header {
-    padding: 8px 22px;
+    padding: 8px 24px;
     color: #ddd;
     background: rgba(255,255,255,0.08);
-    border: 1px solid #666;
+    border: 1px solid #555;
     border-radius: 6px;
     cursor: pointer;
     font-size: 1.02em;
     white-space: nowrap;
-    transition: all 0.2s ease;
+    transition: all 0.2s;
 }
 
 .tab-header:hover {
     background: rgba(255,255,255,0.18);
-    border-color: #888;
+    border-color: #777;
 }
 
 .tab-header.active {
     background: #3a1a22 !important;
     border-color: #c8102e;
     color: white;
-    box-shadow: 0 0 10px rgba(200,16,46,0.6);
 }
 
 /* Content Area */
@@ -321,7 +333,7 @@ td[data-tooltip]:hover::after {
     padding: 16px;
 }
 
-/* Hide any old broken arrows */
+/* Cleanup old arrows */
 #quick-access-tabs .arrow,
 #quick-access-tabs .section-header > div:last-child {
     display: none !important;
