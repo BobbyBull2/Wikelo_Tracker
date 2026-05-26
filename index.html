@@ -11,7 +11,27 @@
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
 
     <style>
-
+@media (max-width: 600px) {
+    .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+    
+    .topbar-row {
+        margin-bottom: 6px;
+    }
+    
+    #topbar-toggle {
+        font-size: 1em;
+        padding: 6px 10px;
+    }
+    
+    .controls button {
+        padding: 8px 14px;
+        font-size: 0.9em;
+    }
+}
 body {
     position: relative;
     z-index: 1;
@@ -551,71 +571,61 @@ h1.page-title{
 </div>
     <div class="stars"></div>
 
-    <div class="topbar">
-      <div class="topbar-inner">
-        <div class="topbar-row">
-          <h1 class="page-title">Bobby's Wikelo Tracker v4.8</h1>
-          <div class="controls">
-            <button class="print-btn" onclick="window.print()">🖨️ Print (Landscape)</button>
-            <button class="reset-all-btn" onclick="resetAll()">Reset All Progress</button>
-            <button class="share-btn" onclick="shareProgress()">Share Progress</button>
-            <button class="share-btn" onclick="expandAllContracts()">Expand All</button>
-            <button class="reset-all-btn" onclick="collapseAllContracts()">Collapse All</button>
-          </div>
+<div class="topbar">
+    <div class="topbar-inner">
+        <!-- Main Title + Toggle Button -->
+        <div class="topbar-row" style="justify-content: space-between; align-items: center;">
+            <h1 class="page-title">Bobby's Wikelo Tracker v4.8</h1>
+            
+            <!-- Collapse Toggle Button (visible on mobile) -->
+            <button id="topbar-toggle" 
+                    onclick="toggleTopbar()"
+                    style="background: rgba(255,255,255,0.1); border: 1px solid #555; color: #ddd; padding: 8px 12px; border-radius: 8px; font-size: 1.1em; cursor: pointer;">
+                ▲ Hide Top Bar
+            </button>
         </div>
 
-        <div class="topbar-row" style="margin-top: 8px;">
-          <div class="topbar-metrics">
-            <div class="stats" id="stats-text">Loading progress…</div>
-            <div class="global-progress" aria-label="Global progress">
-              <div class="global-bar" id="global-bar"></div>
+        <!-- Collapsible Content -->
+        <div id="topbar-content">
+            <!-- Controls -->
+            <div class="topbar-row" style="margin-top: 8px;">
+                <div class="controls">
+                    <button class="print-btn" onclick="window.print()">🖨️ Print</button>
+                    <button class="reset-all-btn" onclick="resetAll()">Reset All</button>
+                    <button class="share-btn" onclick="shareProgress()">Share</button>
+                    <button class="share-btn" onclick="expandAllContracts()">Expand All</button>
+                    <button class="reset-all-btn" onclick="collapseAllContracts()">Collapse All</button>
+                </div>
             </div>
-          </div>
+
+            <!-- Stats + Progress -->
+            <div class="topbar-row" style="margin-top: 10px;">
+                <div class="topbar-metrics">
+                    <div class="stats" id="stats-text">Loading progress…</div>
+                    <div class="global-progress" aria-label="Global progress">
+                        <div class="global-bar" id="global-bar"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search + Org -->
+            <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center; margin: 12px 0 8px;">
+                <div style="flex: 1 1 300px; min-width: 280px;">
+                    <input type="text" class="search-box" id="search" placeholder="Search contracts or rewards..." 
+                           oninput="filterContracts()" style="width: 100%; height: 44px; margin: 0;">
+                </div>
+                
+                <div id="org-section" style="flex: 1 1 50px; min-width: 300px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                    <input type="text" id="org-code" placeholder="e.g. Unique Name" 
+                           style="flex: 1 1 80px; height: 44px; padding: 0 12px; font-size: 1em; border-radius: 8px; border: 1px solid #555; background: #1a1a22; color: #d0d0d0;"/>
+                    <button onclick="joinOrg()" style="height: 44px; padding: 0 24px; font-weight: 600; background: linear-gradient(135deg, #c8102e, #a00d24); border: none; border-radius: 10px; color: white; cursor: pointer;">
+                        Join / Create Org
+                    </button>
+                </div>
+            </div>
         </div>
-
-  
-
-<!-- Combined search + org sharing row – PERFECTLY level, minimal bottom space -->
-<div style="display: flex; flex-wrap: wrap; gap: 30px; align-items: center; margin: 12px 0 0;">
-    <!-- Search box – exact height match -->
-    <div style="flex: 1 1 300px; min-width: 280px;">
-        <input type="text" class="search-box" id="search" placeholder="Search contracts or rewards..." oninput="filterContracts()"
-               style="width: 100%; height: 44px; margin: 0; padding: 0 12px; font-size: 1em; line-height: 44px; box-sizing: border-box; border-radius: 8px;">
-    </div>
-
-    <!-- Org Sharing – inline label + input/button, no extra vertical space -->
-    <div id="org-section" style="flex: 1 1 50px; min-width: 320px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-        
-        <input type="text" id="org-code" placeholder="e.g. Unique Name"
-               style="flex: 1 1 80px; height: 44px; padding: 0 12px; font-size: 1em; line-height: 44px; border-radius: 8px; border: 1px solid #555; background: #1a1a22; color: #d0d0d0; margin: 0; box-sizing: border-box;"/>
-        <button onclick="joinOrg()"
-        style="
-            height: 40px;
-            padding: 0 28px;
-            font-size: 1em;
-            font-weight: 600;
-            color: white;
-            background: linear-gradient(135deg, #c8102e 0%, #a00d24 100%);
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(200,16,46,0.4);
-            transition: all 0.25s ease;
-            position: relative;
-            overflow: hidden;
-        "
-        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(200,16,46,0.6)'"
-        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(200,16,46,0.4)'"
-        onmousedown="this.style.transform='translateY(1px)'; this.style.boxShadow='0 2px 6px rgba(200,16,46,0.5)'"
-        onmouseup="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(200,16,46,0.6)'">
-    <span style="position: relative; z-index: 1;">Join / Create Org</span>
-    <span style="position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent); transform: translateX(-100%); transition: transform 0.5s;"></span>
-</button>
     </div>
 </div>
-
-      </div>
-    </div>
 
 <!-- ┌───────────────────────────────────────────────────────────────┐
      │ Horizontal Tabs – Starts Collapsed – Kyle's Wikelo Tracker │
@@ -2243,6 +2253,33 @@ h1.page-title{
     </p>
 </footer>
 <script>
+
+    let topbarCollapsed = false;
+
+function toggleTopbar() {
+    const content = document.getElementById('topbar-content');
+    const toggleBtn = document.getElementById('topbar-toggle');
+    
+    topbarCollapsed = !topbarCollapsed;
+    
+    if (topbarCollapsed) {
+        content.style.display = 'none';
+        toggleBtn.textContent = '▼ Show Top Bar';
+        toggleBtn.style.background = 'rgba(139,0,0,0.6)';
+    } else {
+        content.style.display = 'block';
+        toggleBtn.textContent = '▲ Hide Top Bar';
+        toggleBtn.style.background = 'rgba(255,255,255,0.1)';
+    }
+}
+
+// Optional: Auto-collapse on very small screens
+window.addEventListener('load', () => {
+    if (window.innerWidth < 600) {
+        // You can choose to auto-collapse on load if you want
+        // toggleTopbar();
+    }
+});
     // Firebase initialization
     const firebaseConfig = {
         apiKey: "AIzaSyDV2A-4pO7A0F33Nw-0NxNtdsGI_aWJQ2M",
