@@ -245,13 +245,13 @@ td[data-tooltip]:hover::after {
 .status-light.yellow { background: #ffaa00; }
 .status-light.green { background: #4a704a; }
 
-/* ==================== QUICK ACCESS TABS - FIXED LABELS ==================== */
+/* ==================== QUICK ACCESS TABS - FIXED ==================== */
 
 #quick-access-tabs {
     max-width: 1600px;
     margin: 14px auto 0;
-    border: 1px solid rgba(255,255,255,0.12);
     background: rgba(18,18,26,0.95);
+    border: 1px solid rgba(255,255,255,0.15);
     border-radius: 8px;
     overflow: hidden;
 }
@@ -260,15 +260,16 @@ td[data-tooltip]:hover::after {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 18px;
+    padding: 16px 20px;
     cursor: pointer;
-    font-size: 1.18em;
+    font-size: 1.2em;
+    font-weight: 500;
 }
 
-/* Clean single arrow */
+/* Arrow */
 #quick-access-tabs .section-header::after {
     content: '▼' !important;
-    font-size: 1.35em;
+    font-size: 1.4em;
     transition: transform 0.3s ease;
     margin-left: auto;
 }
@@ -277,12 +278,12 @@ td[data-tooltip]:hover::after {
     transform: rotate(180deg) !important;
 }
 
-/* Tab Bar with visible labels */
+/* THE IMPORTANT PART - Tab Bar with Labels */
 #quick-access-tabs .tab-headers {
     display: none;
     justify-content: center;
-    gap: 14px;
-    padding: 14px 16px;
+    gap: 16px;
+    padding: 14px 20px;
     background: #1f1f28;
     border-top: 1px solid #444;
     flex-wrap: wrap;
@@ -292,48 +293,39 @@ td[data-tooltip]:hover::after {
     display: flex !important;
 }
 
-/* Individual Tabs */
+/* Tab Buttons */
 .tab-header {
-    padding: 9px 26px;
-    color: #e0e0e0;
-    background: rgba(255,255,255,0.09);
+    padding: 10px 26px;
+    color: #eee;
+    background: rgba(255,255,255,0.1);
     border: 1px solid #666;
     border-radius: 6px;
     cursor: pointer;
     font-size: 1.05em;
     white-space: nowrap;
-    transition: all 0.2s;
 }
 
 .tab-header:hover {
     background: rgba(255,255,255,0.2);
-    border-color: #999;
 }
 
 .tab-header.active {
     background: #3a1a22 !important;
     border-color: #c8102e;
     color: white;
-    box-shadow: 0 0 12px rgba(200,16,46,0.5);
 }
 
-/* Content */
+/* Content Area */
 #quick-access-tabs .section-content {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.4s ease;
-    padding: 0 16px;
+    padding: 0 20px;
 }
 
 #quick-access-tabs.open .section-content {
-    max-height: 12000px !important;
-    padding: 16px;
-}
-
-/* Cleanup */
-#quick-access-tabs .arrow,
-#quick-access-tabs .section-header > div:last-child {
-    display: none !important;
+    max-height: 15000px !important;
+    padding: 20px;
 }
 /* =========================================================
    Professional layout + less scrolling (non-destructive)
@@ -2272,6 +2264,13 @@ h1.page-title{
     </p>
 </footer>
 <script>
+    // Auto collapse topbar on load
+document.addEventListener('DOMContentLoaded', () => {
+    const content = document.getElementById('topbar-content');
+    const toggle = document.getElementById('topbar-toggle');
+    if (content) content.style.display = 'none';
+    if (toggle) toggle.textContent = '▼ Show Top Bar';
+});
 
     let topbarCollapsed = false;
 
