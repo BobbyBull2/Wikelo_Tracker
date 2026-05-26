@@ -593,12 +593,14 @@ h1.page-title{
 
 <div class="topbar">
     <div class="topbar-inner">
-        <!-- Main Title + Toggle Button -->
-        <div class="topbar-row" style="justify-content: space-between; align-items: center;">
+        <!-- Clickable Top Bar Row -->
+        <div class="topbar-row" id="topbar-header" style="justify-content: space-between; align-items: center; cursor: pointer; padding: 8px 0;">
             <h1 class="page-title">Bobby's Wikelo Tracker v4.8</h1>
             
-            <!-- Collapse Toggle Button (visible on mobile) -->
-            <button id="topbar-toggle" onclick="toggleTopbar()">▼ Show Controls</button>
+            <!-- Toggle Text -->
+            <span id="topbar-toggle-text" style="background: rgba(255,255,255,0.1); border: 1px solid #555; color: #ddd; padding: 8px 14px; border-radius: 8px; font-size: 1.05em; user-select: none;">
+                ▼ Show Controls
+            </span>
         </div>
 
         <!-- Collapsible Content -->
@@ -2276,24 +2278,34 @@ document.addEventListener('DOMContentLoaded', () => {
     if (toggle) toggle.textContent = '▼ Show Top Bar';
 });
 
-    let topbarCollapsed = false;
+    let topbarCollapsed = true; // Start collapsed
 
 function toggleTopbar() {
     const content = document.getElementById('topbar-content');
-    const toggleBtn = document.getElementById('topbar-toggle');
+    const toggleText = document.getElementById('topbar-toggle-text');
     
     topbarCollapsed = !topbarCollapsed;
     
     if (topbarCollapsed) {
         content.style.display = 'none';
-        toggleBtn.textContent = '▼ Show Top Bar';
-        toggleBtn.style.background = 'rgba(139,0,0,0.6)';
+        toggleText.textContent = '▼ Show Controls';
     } else {
         content.style.display = 'block';
-        toggleBtn.textContent = '▲ Hide Top Bar';
-        toggleBtn.style.background = 'rgba(255,255,255,0.1)';
+        toggleText.textContent = '▲ Hide Controls';
     }
 }
+
+// Make the entire topbar header clickable
+document.addEventListener('DOMContentLoaded', () => {
+    const header = document.getElementById('topbar-header');
+    if (header) {
+        header.addEventListener('click', toggleTopbar);
+    }
+    
+    // Start collapsed
+    const content = document.getElementById('topbar-content');
+    if (content) content.style.display = 'none';
+});
 
 // Optional: Auto-collapse on very small screens
 window.addEventListener('load', () => {
