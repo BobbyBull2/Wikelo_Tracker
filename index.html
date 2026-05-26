@@ -245,37 +245,37 @@ td[data-tooltip]:hover::after {
 .status-light.yellow { background: #ffaa00; }
 .status-light.green { background: #4a704a; }
 
-/* ==================== QUICK ACCESS TABS ==================== */
+/* ==================== QUICK ACCESS TABS (Clean + Visible Labels) ==================== */
 
 #quick-access-tabs .section-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 16px;
+    padding: 14px 16px;
+    cursor: pointer;
 }
 
-/* Single Arrow on the right */
+/* Main Arrow on the right */
 #quick-access-tabs .section-header::after {
     content: '▼' !important;
-    font-size: 1.2em;
+    font-size: 1.25em;
     transition: transform 0.3s ease;
     margin-left: auto;
-    padding-left: 12px;
 }
 
-/* Rotate arrow when open */
+/* Rotate arrow */
 #quick-access-tabs.open .section-header::after {
     transform: rotate(180deg) !important;
 }
 
-/* Tab Headers - where "Inventory", "Tips", "Links" live */
+/* Tab Bar (Inventory, Tips, Links) */
 #quick-access-tabs .tab-headers {
     display: none;
     justify-content: center;
-    gap: 20px;
+    gap: 16px;
     padding: 12px 16px;
     background: #111118;
-    border-bottom: 1px solid #333;
+    border-bottom: 1px solid #444;
     flex-wrap: wrap;
 }
 
@@ -283,26 +283,29 @@ td[data-tooltip]:hover::after {
     display: flex !important;
 }
 
-/* Individual Tab Styling */
+/* Individual Tab Buttons */
 .tab-header {
-    padding: 8px 20px;
+    padding: 8px 22px;
     color: #ddd;
     background: rgba(255,255,255,0.08);
-    border: 1px solid #555;
+    border: 1px solid #666;
     border-radius: 6px;
     cursor: pointer;
-    transition: all 0.2s;
+    font-size: 1.02em;
     white-space: nowrap;
+    transition: all 0.2s ease;
 }
 
 .tab-header:hover {
-    background: rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.18);
+    border-color: #888;
 }
 
 .tab-header.active {
     background: #3a1a22 !important;
     border-color: #c8102e;
-    box-shadow: 0 0 8px rgba(200,16,46,0.5);
+    color: white;
+    box-shadow: 0 0 10px rgba(200,16,46,0.6);
 }
 
 /* Content Area */
@@ -310,19 +313,19 @@ td[data-tooltip]:hover::after {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.4s ease;
+    padding: 0 16px;
 }
 
 #quick-access-tabs.open .section-content {
-    max-height: 6000px !important;
-    padding: 14px 16px;
+    max-height: 8000px !important;
+    padding: 16px;
 }
 
-/* Hide any leftover conflicting arrows */
+/* Hide any old broken arrows */
 #quick-access-tabs .arrow,
 #quick-access-tabs .section-header > div:last-child {
     display: none !important;
 }
-
 /* =========================================================
    Professional layout + less scrolling (non-destructive)
    ========================================================= */
