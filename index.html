@@ -245,20 +245,20 @@ td[data-tooltip]:hover::after {
 .status-light.yellow { background: #ffaa00; }
 .status-light.green { background: #4a704a; }
 
-/* Arrow rotation */
+/* ==================== QUICK ACCESS TABS STYLES ==================== */
+
 /* Single Arrow for Quick Access Tabs */
 #quick-access-tabs .section-header::after {
-    content: '▼';
-    font-size: 1.1em;
+    content: '▼' !important;
+    font-size: 1.15em;
     margin-left: 8px;
     transition: transform 0.3s ease;
+    display: inline-block;
 }
 
+/* Rotate the arrow when open */
 #quick-access-tabs.open .section-header::after {
-    transform: rotate(180deg);
-}
-#quick-access-tabs .section-header::after {
-    content: '▼' !important;
+    transform: rotate(180deg) !important;
 }
 
 /* Tab active style */
@@ -273,51 +273,42 @@ td[data-tooltip]:hover::after {
     transition: opacity 0.3s ease;
 }
 
-/* Ensure tab bar only shows when main section has .open class */
+/* Tab Headers (only show when tabs section is open) */
 #quick-access-tabs .tab-headers {
     display: none;
-justify-content: center;
-    gap: 16px;          /* even spacing between tabs */
+    justify-content: center;
+    gap: 16px;
     padding: 12px 16px;
     background: #111118;
     border-bottom: 1px solid #333;
     flex-wrap: wrap;
 }
-#quick-access-tabs.open .tab-headers {
-    display: flex !important;
-}
 
 #quick-access-tabs.open .tab-headers {
     display: flex !important;
 }
 
-/* Force content area to expand when .open is present */
+/* Content area expansion */
 #quick-access-tabs .section-content {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.4s ease;
 }
+
 #quick-access-tabs.open .section-content {
-    max-height: 5000px !important;  /* large enough for any content */
+    max-height: 5000px !important;
 }
-/* Make sure content expands fully */
+
+/* Force full expansion on [open] attribute as backup */
 #quick-access-tabs[open] .section-content {
-    max-height: 4000px !important; /* bigger than any realistic content */
-    padding: 0 !important; /* keep padding 0 as per your design */
+    max-height: 4000px !important;
+    padding: 0 !important;
 }
-/* Arrow rotation – target only the .arrow element */
-#quick-access-tabs .arrow {
-    transform: rotate(0deg);
-    transition: transform 0.3s ease;
-}
-#quick-access-tabs.open .arrow {
-    transform: rotate(180deg);
-}
-/* Optional: visual feedback when tab is active */
-.tab-header.active {
-    background: #3a1a22 !important;
-    border-color: #666 !important;
-    box-shadow: 0 0 8px rgba(200,16,46,0.4);
+
+/* Hide any old conflicting arrow elements */
+#quick-access-tabs .arrow,
+#quick-access-tabs .section-header > div:last-child {
+    display: none !important;
 }
 
 /* =========================================================
