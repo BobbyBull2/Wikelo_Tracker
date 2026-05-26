@@ -11,6 +11,11 @@
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
 
     <style>
+/* Kill the old inline arrow completely */
+#quick-access-tabs .arrow {
+    display: none !important;
+}
+        
 @media (max-width: 600px) {
     .topbar {
         position: sticky;
@@ -655,7 +660,6 @@ h1.page-title{
         <div style="font-size:1.3em; font-weight:bold; color:#e0e0e0; flex:1; text-align:center;">
             Links
         </div>
-        <div class="arrow" style="font-size:1em; color:#b0b0b0; transition:transform 0.3s ease;">▼</div>
     </div>
 </div>
 
