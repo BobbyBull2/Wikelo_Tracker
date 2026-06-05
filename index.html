@@ -602,7 +602,29 @@ h1.page-title{
                 ▼ Show Controls
             </span>
         </div>
+<!-- ALWAYS VISIBLE SEARCH -->
+<div style="display:flex; align-items:center; gap:12px; margin-top:10px;">
+    
+    <div style="flex:1;">
+        <input
+            type="text"
+            class="search-box"
+            id="search"
+            placeholder="Search contracts or rewards..."
+            oninput="filterContracts()"
+            style="
+                width:100%;
+                height:42px;
+                margin:0;
+                background:rgba(255,255,255,0.08);
+                border:1px solid rgba(255,255,255,0.15);
+                border-radius:10px;
+                color:#fff;
+            "
+        >
+    </div>
 
+</div>
         <!-- Collapsible Content -->
         <div id="topbar-content">
             <!-- Controls -->
@@ -627,11 +649,7 @@ h1.page-title{
             </div>
 
             <!-- Search + Org -->
-            <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center; margin: 12px 0 8px;">
-                <div style="flex: 1 1 300px; min-width: 280px;">
-                    <input type="text" class="search-box" id="search" placeholder="Search contracts or rewards..." 
-                           oninput="filterContracts()" style="width: 100%; height: 44px; margin: 0;">
-                </div>
+            
                 
                 <div id="org-section" style="flex: 1 1 50px; min-width: 300px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
                     <input type="text" id="org-code" placeholder="e.g. Unique Name" 
