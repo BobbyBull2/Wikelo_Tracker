@@ -656,12 +656,12 @@ h1.page-title{
             <!-- ORG SECTION -->
 <div id="org-section"
      style="
-        width: 100%;
-        max-width: 400px;
         display: flex;
         align-items: center;
         gap: 12px;
-        margin-top: 12px;
+        width: 100%;
+        max-width: 400px;
+        margin-top: 10px;
      ">
 
     <input
@@ -677,7 +677,7 @@ h1.page-title{
             border: 1px solid #555;
             background: #1a1a22;
             color: #d0d0d0;
-            min-width: 0;
+            box-sizing: border-box;
         "
     />
 
@@ -685,7 +685,7 @@ h1.page-title{
         onclick="joinOrg()"
         style="
             height: 44px;
-            padding: 0 20px;
+            padding: 0 18px;
             font-weight: 600;
             background: linear-gradient(135deg, #c8102e, #a00d24);
             border: none;
@@ -693,6 +693,7 @@ h1.page-title{
             color: white;
             cursor: pointer;
             white-space: nowrap;
+            flex-shrink: 0;
         "
     >
         Join / Create Org
