@@ -11,6 +11,13 @@
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
 
     <style>
+        #quick-access-tabs {
+    max-height: none !important;
+}
+#quick-access-tabs:not(.open) .section-content {
+    max-height: 0 !important;
+    overflow: hidden;
+}
 /* Kill the old inline arrow completely */
 #quick-access-tabs .arrow {
     display: none !important;
