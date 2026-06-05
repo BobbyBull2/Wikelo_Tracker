@@ -653,15 +653,23 @@ h1.page-title{
             <!-- Search + Org -->
             
                 
-               <div id="org-section"
-     style="flex: 0 0 300px; max-width: 300px; display: flex; align-items: center; gap: 12px;">
+            <!-- ORG SECTION -->
+<div id="org-section"
+     style="
+        width: 100%;
+        max-width: 400px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 12px;
+     ">
 
     <input
         type="text"
         id="org-code"
         placeholder="e.g. Unique Name"
         style="
-            width: 100%;
+            flex: 1;
             height: 44px;
             padding: 0 12px;
             font-size: 1em;
@@ -669,6 +677,7 @@ h1.page-title{
             border: 1px solid #555;
             background: #1a1a22;
             color: #d0d0d0;
+            min-width: 0;
         "
     />
 
@@ -676,7 +685,7 @@ h1.page-title{
         onclick="joinOrg()"
         style="
             height: 44px;
-            padding: 0 24px;
+            padding: 0 20px;
             font-weight: 600;
             background: linear-gradient(135deg, #c8102e, #a00d24);
             border: none;
@@ -689,10 +698,6 @@ h1.page-title{
         Join / Create Org
     </button>
 
-</div>
-            </div>
-        </div>
-    </div>
 </div>
 
 <!-- ┌───────────────────────────────────────────────────────────────┐
